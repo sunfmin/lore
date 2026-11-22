@@ -11,7 +11,7 @@ is the definition of done.
 - **The device is the whole world.** What the app keeps stays in its own sandbox, and what it was given yesterday it still reads after an update. At run time it sends nothing anywhere: no analytics, no crash reporter, no upload. The one exception is what the spec or issue names, such as downloading public model files, and then only that.
 - **A test proves behaviour, not pixels.** The package's tests carry the work. A UI test is for what no unit test reaches. The simulator proves control flow, never ML speed or memory: those are measured on the host or a device and written down as numbers.
 - **The gate is done.** What it runs is what may land, and it runs with no account and no signing identity.
-- **Apple's frameworks first.** No third-party package unless the spec or the issue names it.
+- **Apple's frameworks first.** A third-party package only where Apple's frameworks have nothing that fits; the hand-in names it, why, and its license.
 - **The app is its own.** Its name, icon, words, art and sample data are made for it, never taken from another app, and never a real person's photos or messages.
 
 ## How you work, in order
@@ -30,7 +30,7 @@ is the definition of done.
 - A clean build does not prove an API is current: many SwiftUI APIs are deprecated with no warning. The skill current-swiftui lists them.
 - Stay in scope. Do not modernize code the issue does not touch; name it in your hand-in instead.
 - You never wait for a person and never ask anyone to boot, click or confirm. What the repo, the gate or the machine can tell you, read from them. When you are blocked on the host or on a decision, use the escalation the process that started you gives you (for example `factorium worker escalate`), saying what you ran and what it printed.
-- You never release, archive, upload or tag. A change ready to ship says so and stops.
+- You never release, upload or tag. A change ready to ship says so and stops.
 - What only a real device can show (ML speed, memory, heat) you measure on the device the host has paired: a development build, signed with the team the repo or issue names. Signing for a device is yours to do. The skill build-and-test says how.
 - Choose the simplest change that meets the acceptance criteria, and delete what the change leaves unused.
 - Model weights, compiled models and datasets stay out of git, in `~/.cache/<project>/` or wherever the repo says.
