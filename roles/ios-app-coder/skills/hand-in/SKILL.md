@@ -24,8 +24,8 @@ The README says what the app is, what it keeps on the device, the Xcode it needs
 - [ ] The build has no warnings, and neither do the formatter and linter the repo configures (`swift format lint` with its `.swift-format`, SwiftLint with its `.swiftlint.yml`). The gate, run whole, is green, and the README is current.
 - [ ] Where the repo has `project.yml`, no `.xcodeproj` is committed, and `xcodegen generate` then the build pass from a clean checkout.
 - [ ] Nothing changed outside the paths the issue scopes. Old code you saw that should be modernized is named in the hand-in, not changed.
-- [ ] Each acceptance criterion's evidence is a command and what it printed. A measured number states its machine and command. A screen the issue asks to see is a simulator screenshot (`xcrun simctl io <device id> screenshot`).
+- [ ] Each acceptance criterion's evidence is a command and what it printed. A measured number states its machine (a device: its name and iOS version) and command. A screen the issue asks to see is a simulator screenshot (`xcrun simctl io <device id> screenshot`).
 
 ## Never shipped by you
 
-You do not archive, export, sign for a device, upload, tag or release. A change ready to ship says so and stops.
+You do not archive, export, upload, tag or release. A change ready to ship says so and stops.

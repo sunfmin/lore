@@ -32,3 +32,10 @@ description: "Use on every change to an iOS app, and first when something is rep
 - The gate names or picks its destination, and a run by hand uses the same device, by id. Pick devices from `xcrun simctl list devices available --json`, never a hard-coded name. When none fits, create one (`xcrun simctl create <name> <devicetype> <runtime>`), use it by id, and delete only devices you created.
 - Simulator builds need no signing identity. When one is asked for, the project or the gate is wrong: the fix is `CODE_SIGNING_ALLOWED=NO` for simulator builds, never a certificate.
 - A missing runtime, a device that will not boot, or a broken Xcode is the host's problem, not yours. Escalate it with what you ran and what it printed. Do not change the gate to get around it.
+
+## A physical device
+
+- Only for what the simulator cannot show (ML speed, memory, heat) or what the issue says must run on a device. It is never part of the gate.
+- Find the device in `xcrun devicectl list devices --json-output <file>`: physical, paired, connected. None there is the host's problem: escalate.
+- Build for it with the team the repo or issue names and automatic signing (`-allowProvisioningUpdates`), with the identity already in the keychain. A build that asks for another identity or certificate is escalated, never fixed by making one.
+- Every install, launch and run goes through the host's exclusive queue as one command (for example `factorium worker exclusive -- <script>`): install, launch with the console attached, read the output, remove your app.
