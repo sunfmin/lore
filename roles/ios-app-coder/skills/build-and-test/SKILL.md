@@ -37,5 +37,5 @@ description: "Use on every change to an iOS app, and first when something is rep
 
 - Only for what the simulator cannot show (ML speed, memory, heat) or what the issue says must run on a device. It is never part of the gate.
 - Find the device in `xcrun devicectl list devices --json-output <file>`: physical, paired, connected. None there is the host's problem: escalate.
-- Build for it with the team the repo or issue names and automatic signing (`-allowProvisioningUpdates`), with the identity already in the keychain. A build that asks for another identity or certificate is escalated, never fixed by making one.
+- Build for it with the team the repo or issue names and automatic signing (`-allowProvisioningUpdates`). Xcode may make a development certificate or profile for it; that is fine.
 - One run is one command: install, launch with the console attached, read the output, remove your app.
