@@ -1,0 +1,5 @@
+description = "XcodeGen: generates the .xcodeproj from project.yml"
+check = "xcodegen --version"
+[install]
+brew = "xcodegen"
+version = "2.48.0"

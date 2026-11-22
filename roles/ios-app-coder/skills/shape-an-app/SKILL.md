@@ -28,6 +28,8 @@ description: "Use before writing code for a new screen, a new kind of data, a ne
 
 ## The project
 
-- A new app target uses folder-synchronized groups, so a new Swift file needs no edit to the project file. The project file changes only for a target, a setting or a scheme, and is committed with the change that needs it.
-- Use one main type per file, with files in folders by feature. The shared scheme the gate builds is committed, and its test action lists every test target the gate must run, a local package's too, since xcodebuild runs only the tests its scheme names.
+- The project is generated: `project.yml` (XcodeGen) is the one file that says what the targets, settings, schemes and package dependencies are. The `.xcodeproj` is in `.gitignore` and made by `xcodegen generate`, which the gate runs before it builds. Never edit or commit a generated `project.pbxproj`. Why: workers land in parallel, and a hand-edited project file is the file that conflicts and breaks silently.
+- Targets take their sources by directory, so a new Swift file needs no change to `project.yml`. `project.yml` changes only for a target, a setting, a scheme or a dependency, in the change that needs it, and `xcodegen generate` followed by the build proves it.
+- A repo that already commits its `.xcodeproj` and has no `project.yml` keeps it: use folder-synchronized groups there, and do not move it to XcodeGen unless the issue says so.
+- Use one main type per file, with files in folders by feature. The scheme the gate builds is declared in `project.yml` (or, in a repo without one, committed as a shared scheme), and its test action lists every test target the gate must run, a local package's too, since xcodebuild runs only the tests its scheme names.
 - Keep the deployment target and Swift version as the project has them. A newer API goes behind `#available` or waits for the issue that raises the target.
