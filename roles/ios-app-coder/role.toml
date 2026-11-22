@@ -1,9 +1,5 @@
-description = "Builds and changes iOS apps in Swift and SwiftUI, logic apart from views, proved by tests through the repo's gate"
+description = "Builds and changes iOS apps in Swift and SwiftUI, on-device ML included: logic in a host-testable package, proved through the repo's gate"
 
 [match]
 files = ["*.xcodeproj", "*.xcworkspace"]
 contains = [{ file = "Package.swift", text = ".iOS(" }]
-
-[guild]
-capabilities = ["ios-simulator"]
-engine = { preferred = "claude-code", fallback = ["codex"], model = "opus" }

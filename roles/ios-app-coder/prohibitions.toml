@@ -1,239 +1,31 @@
 [[prohibition]]
-rule = "Never run `git push --force*`"
-why = "A force push rewrites history others have."
-
-[prohibition.guild]
-id = "no-force-push"
-guards = "irreversible"
-on = "shell"
-match = "git push --force*"
+rule = "Never force-push or rewrite a branch others have"
+why = "A force push rewrites history others build on."
 
 [[prohibition]]
-rule = "Never run `* repos delete *`"
-why = "A deleted repo cannot be had back."
-
-[prohibition.guild]
-id = "no-repo-delete"
-guards = "irreversible"
-on = "shell"
-match = "* repos delete *"
+rule = "Never upload a build (`xcrun altool`, `xcrun iTMSTransporter`, `xcodebuild -exportArchive` to App Store Connect) or archive one"
+why = "A build uploaded to App Store Connect cannot be taken back; releasing is not this role's."
 
 [[prohibition]]
-rule = "Never run `security find-*-password*`"
-why = "Credentials are the steward's to hand out."
-
-[prohibition.guild]
-id = "no-keychain-read"
-guards = "credentials"
-on = "shell"
-match = "security find-*-password*"
+rule = "Never import, read or create a signing identity or certificate (`security import`, `security find-identity`)"
+why = "Simulator builds need none; signing identities are handed out by a person."
 
 [[prohibition]]
-rule = "Never fetch https://*checkout*"
-why = "Spending money is Felix's alone."
-
-[prohibition.guild]
-id = "no-checkout"
-guards = "money"
-on = "fetch"
-match = "https://*checkout*"
+rule = "Never install the app on a physical device (`xcrun devicectl`)"
+why = "This role signs for no device; its apps run in the simulator."
 
 [[prohibition]]
-rule = "Never fetch https://*paste*"
-why = "Private data stays on Guild's machines."
-
-[prohibition.guild]
-id = "no-paste-out"
-guards = "data-leaving-host"
-on = "fetch"
-match = "https://*paste*"
+rule = "Never delete, erase or shut down a simulator you did not create"
+why = "The machine's simulators are shared with other workers."
 
 [[prohibition]]
-rule = "Never run `*gh issue create*`"
-why = "What goes to GitHub is filed by the steward's filer alone: a cause in Guild's code with guild ticket file, which labels it for the guild fleet, files it once per cause and follows it; Guild's own issues are read and commented on with guild task and guild goal, never gh."
-
-[prohibition.guild]
-id = "no-gh-file"
-guards = "data-leaving-host"
-on = "shell"
-match = "*gh issue create*"
+rule = "Never commit model weights, compiled models, datasets or a real person's photos"
+why = "They are large, often licensed apart from the code, and private data must not reach git."
 
 [[prohibition]]
-rule = "Never run `git push * HEAD:main*`"
-why = "Work reaches the base branch only by a pull request the warden lands."
-
-[prohibition.guild]
-id = "no-push-base"
-guards = "none"
-on = "shell"
-match = "git push * HEAD:main*"
+rule = "Never make the app send user data off the device unless the spec or issue says so"
+why = "The device is the whole world: users trust the app with private data."
 
 [[prohibition]]
-rule = "Never run `git push * main*`"
-why = "Work reaches the base branch only by a pull request the warden lands."
-
-[prohibition.guild]
-id = "no-push-main"
-guards = "none"
-on = "shell"
-match = "git push * main*"
-
-[[prohibition]]
-rule = "Never run `guild task review *`"
-why = "The warden accepts or sends back work; this role never reviews its own."
-
-[prohibition.guild]
-id = "no-review"
-guards = "none"
-on = "shell"
-match = "guild task review *"
-
-[[prohibition]]
-rule = "Never run `guild pull approve *`"
-why = "Approving a pull request is the warden's; this role hands its work in."
-
-[prohibition.guild]
-id = "no-approve"
-guards = "none"
-on = "shell"
-match = "guild pull approve *"
-
-[[prohibition]]
-rule = "Never run `guild land *`"
-why = "Landing is the code's, on the warden's approval; this role never lands."
-
-[prohibition.guild]
-id = "no-land"
-guards = "none"
-on = "shell"
-match = "guild land *"
-
-[[prohibition]]
-rule = "Never run `guild role *`"
-why = "Only the trainer crew drafts, defines or restores roles."
-
-[prohibition.guild]
-id = "no-role-draft"
-guards = "none"
-on = "shell"
-match = "guild role *"
-
-[[prohibition]]
-rule = "Never run `guild goal *`"
-why = "Goals and their levers are the foreman's; this role asks it with guild task question."
-
-[prohibition.guild]
-id = "no-goal-lever"
-guards = "none"
-on = "shell"
-match = "guild goal *"
-
-[[prohibition]]
-rule = "Never run `guild stop --hard*`"
-why = "Hard-stopping an instance is the warden's or a person's."
-
-[prohibition.guild]
-id = "no-hard-stop"
-guards = "none"
-on = "shell"
-match = "guild stop --hard*"
-
-[[prohibition]]
-rule = "Never run `guild task decide *`"
-why = "A decision ticket is Felix's to decide; this role asks with guild task ask."
-
-[prohibition.guild]
-id = "no-decide"
-guards = "product-direction"
-on = "shell"
-match = "guild task decide *"
-
-[[prohibition]]
-rule = "Never run `xcrun altool *`"
-why = "A build uploaded to App Store Connect cannot be taken back; this role never submits an app."
-
-[prohibition.guild]
-id = "no-app-upload"
-guards = "irreversible"
-on = "shell"
-match = "xcrun altool *"
-
-[[prohibition]]
-rule = "Never run `xcrun iTMSTransporter *`"
-why = "A build uploaded to App Store Connect cannot be taken back; this role never submits an app."
-
-[prohibition.guild]
-id = "no-transporter"
-guards = "irreversible"
-on = "shell"
-match = "xcrun iTMSTransporter *"
-
-[[prohibition]]
-rule = "Never run `security import *`"
-why = "Signing identities are the steward's to hand out; simulator builds need none."
-
-[prohibition.guild]
-id = "no-identity-import"
-guards = "credentials"
-on = "shell"
-match = "security import *"
-
-[[prohibition]]
-rule = "Never run `security find-identity*`"
-why = "Signing identities are the steward's to hand out; simulator builds need none."
-
-[prohibition.guild]
-id = "no-identity-read"
-guards = "credentials"
-on = "shell"
-match = "security find-identity*"
-
-[[prohibition]]
-rule = "Never run `xcodebuild *archive*`"
-why = "Archiving and exporting are the start of a release, and this role never releases; it builds and tests for the simulator."
-
-[prohibition.guild]
-id = "no-archive"
-guards = "none"
-on = "shell"
-match = "xcodebuild *archive*"
-
-[[prohibition]]
-rule = "Never run `xcrun devicectl *`"
-why = "This role signs for no device and installs on none; its apps run in the simulator."
-
-[prohibition.guild]
-id = "no-device-install"
-guards = "none"
-on = "shell"
-match = "xcrun devicectl *"
-
-[[prohibition]]
-rule = "Never run `xcrun simctl delete *`"
-why = "The machine's simulators are shared with other instances; a run boots and erases only the device it made or names."
-
-[prohibition.guild]
-id = "no-simulator-delete"
-guards = "none"
-on = "shell"
-match = "xcrun simctl delete *"
-
-[[prohibition]]
-rule = "Never run `brew install *`"
-why = "This role installs nothing; a missing Xcode, runtime or tool is a question to the foreman."
-
-[prohibition.guild]
-id = "no-install"
-guards = "none"
-on = "shell"
-match = "brew install *"
-
-[[prohibition]]
-rule = "Never run `git tag *`"
-why = "Releasing is not this role's; a change ready to ship says so in its pull request."
-
-[prohibition.guild]
-id = "no-release"
-guards = "none"
-on = "shell"
-match = "git tag *"
+rule = "Never tag or publish a release"
+why = "Releasing is not this role's; a change ready to ship says so and stops."
