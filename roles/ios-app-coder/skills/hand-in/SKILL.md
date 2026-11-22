@@ -18,6 +18,7 @@ The README says what the app is, what it keeps on the device, the Xcode it needs
 - [ ] The package imports no SwiftUI or UIKit, builds for macOS, and every behaviour the issue adds has a test on it that you saw fail before it passed.
 - [ ] A changed stored type has a migration, and a test that opens the version before.
 - [ ] A search of the sources for `URLSession`, `Network`, `CloudKit`, `StoreKit` and analytics SDKs finds nothing the spec or issue did not ask for.
+- [ ] Every screen the change adds or changes has render tests across the matrix of the skill render-screens. The gate runs them, and each PNG was opened and described in the hand-in.
 - [ ] `scan.sh` of the skill current-swiftui is clean over the files you changed, or each hit kept says why.
 - [ ] No name, icon, text, art or data of another app or of a real person is in the repo. No weights, compiled models or datasets are in git.
 - [ ] The build has no warnings, and neither do the formatter and linter the repo configures (`swift format lint` with its `.swift-format`, SwiftLint with its `.swiftlint.yml`). The gate, run whole, is green, and the README is current.
