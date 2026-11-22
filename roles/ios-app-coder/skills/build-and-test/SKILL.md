@@ -11,7 +11,7 @@ description: "Use on every change to an iOS app, and first when something is rep
 - The only fakes are an in-memory store, a temporary directory, the clock and seed passed in, and a stand-in behind a protocol for an iOS-only edge (PhotoKit, `BGTaskScheduler`). The package itself runs as it is, never mocked. Swift Testing runs tests in parallel and in any order, so each test makes its own store and directory and shares no state with another.
 - Test data is made by the test: rendered text, generated images, hand-made vectors. A small committed fixture (under 1 MB, openly licensed, its source named in the test) is the exception. A test that needs a model file reads it from the cache directory the repo names, and is skipped with a stated reason (`.enabled(if:)`) when the file is absent. Model tests use `.cpuOnly` compute units, so results do not depend on the machine.
 - A stored type has a round-trip test, and a changed one has a test that opens a store written by the version before.
-- A UI test (XCUITest) is for a flow no unit test reaches:
+- A screen is tested by rendering it (the skill render-screens). A UI test (XCUITest) is for a flow neither a unit test nor a render test reaches:
   - It launches with launch arguments that open an in-memory store with known data, and sets the colour scheme inside the app (`.preferredColorScheme`).
   - It finds elements by accessibility identifier, never by position or translatable text. An identifier set on a container covers its `.overlay`.
   - It holds on every device size: find a tab among `app.buttons`, never through `app.tabBars`.
