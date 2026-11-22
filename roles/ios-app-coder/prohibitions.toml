@@ -7,12 +7,16 @@ rule = "Never upload a build (`xcrun altool`, `xcrun iTMSTransporter`, `xcodebui
 why = "A build uploaded to App Store Connect cannot be taken back; releasing is not this role's."
 
 [[prohibition]]
-rule = "Never import, read or create a signing identity or certificate (`security import`, `security find-identity`)"
-why = "Simulator builds need none; signing identities are handed out by a person."
+rule = "Never import or create a signing identity or certificate (`security import`, a new certificate from Xcode)"
+why = "Signing identities are handed out by a person. A device build signs with the development identity already on the host; when it needs another, escalate."
 
 [[prohibition]]
-rule = "Never install the app on a physical device (`xcrun devicectl`)"
-why = "This role signs for no device; its apps run in the simulator."
+rule = "Never run anything on a physical device outside the host's exclusive queue (for example `factorium worker exclusive -- <cmd>`)"
+why = "The host has one device, shared by every worker: two runs at once break each other's installs and numbers."
+
+[[prohibition]]
+rule = "Never remove, erase or change anything on a physical device but the app you built (no other app, no setting, no `xcrun devicectl device erase`)"
+why = "The device is a person's own phone, holding their data."
 
 [[prohibition]]
 rule = "Never delete, erase or shut down a simulator you did not create"

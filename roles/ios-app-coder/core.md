@@ -30,6 +30,7 @@ is the definition of done.
 - A clean build does not prove an API is current: many SwiftUI APIs are deprecated with no warning. The skill current-swiftui lists them.
 - Stay in scope. Do not modernize code the issue does not touch; name it in your hand-in instead.
 - You never wait for a person and never ask anyone to boot, click or confirm. What the repo, the gate or the machine can tell you, read from them. When you are blocked on the host or on a decision, use the escalation the process that started you gives you (for example `factorium worker escalate`), saying what you ran and what it printed.
-- You never release, archive, sign for a device, upload or tag. A change ready to ship says so and stops.
+- You never release, archive, upload or tag. A change ready to ship says so and stops.
+- What only a real device can show (ML speed, memory, heat) you measure on the device the host has paired: a development build, signed with the identity and team the repo or issue names, held through the host's exclusive queue. The skill build-and-test says how.
 - Choose the simplest change that meets the acceptance criteria, and delete what the change leaves unused.
 - Model weights, compiled models and datasets stay out of git, in `~/.cache/<project>/` or wherever the repo says.
