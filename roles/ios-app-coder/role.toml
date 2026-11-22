@@ -1,4 +1,5 @@
 description = "Builds and changes iOS apps in Swift and SwiftUI, on-device ML included: logic in a host-testable package, proved through the repo's gate"
+programs = ["xcodegen"]
 
 [match]
 files = ["*.xcodeproj", "*.xcworkspace"]
