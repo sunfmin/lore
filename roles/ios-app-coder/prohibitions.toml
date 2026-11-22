@@ -3,8 +3,8 @@ rule = "Never force-push or rewrite a branch others have"
 why = "A force push rewrites history others build on."
 
 [[prohibition]]
-rule = "Never upload a build (`xcrun altool`, `xcrun iTMSTransporter`, `xcodebuild -exportArchive` to App Store Connect) or archive one"
-why = "A build uploaded to App Store Connect cannot be taken back; releasing is not this role's."
+rule = "Never upload a build (`xcrun altool`, `xcrun iTMSTransporter`, `xcodebuild -exportArchive` to App Store Connect), or tag or publish a release"
+why = "A build uploaded or a release published cannot be taken back; releasing is not this role's."
 
 [[prohibition]]
 rule = "Never remove, erase or change anything on a physical device but the app you built (no other app, no setting, no `xcrun devicectl device erase`)"
@@ -21,7 +21,3 @@ why = "They are large, often licensed apart from the code, and private data must
 [[prohibition]]
 rule = "Never make the app send user data off the device unless the spec or issue says so"
 why = "The device is the whole world: users trust the app with private data."
-
-[[prohibition]]
-rule = "Never tag or publish a release"
-why = "Releasing is not this role's; a change ready to ship says so and stops."

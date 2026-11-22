@@ -7,7 +7,7 @@ description: "Use when an iOS app runs models or processes the photo library: co
 
 ## Models
 
-- **Licenses.** Only weights whose own license, and whose training data's terms, allow commercial use. The repo's ADR lists which are allowed. A model not on that list is not used until an ADR says it may be.
+- **Licenses.** Only weights whose own license, and whose training data's terms, allow commercial use. The repo's ADR lists which are allowed. A model not on it you add to that list in the same change, quoting its license and its training data's terms; one whose terms you cannot find is not used.
 - **Conversion.** Use `coremltools` to a `.mlpackage`, scripted under the repo's experiments with `uv run`, the source revision pinned. Compare the Core ML output with the original framework's on the same inputs (cosine, or max probability difference) and write the number down. Measured pitfalls on ModernBERT-style encoders:
   - Never use full `int8` on the Neural Engine (outputs drift, predictions flip). Use weight-only or `int8-gather` quantization, and verify it.
   - Never run them through ONNX Runtime's CoreMLExecutionProvider: the graph splits into hundreds of partitions, runs 3-10x slower and fails above batch 1.

@@ -28,4 +28,4 @@ The README says what the app is, what it keeps on the device, the Xcode it needs
 
 ## Never shipped by you
 
-You do not archive, export, upload, tag or release. A change ready to ship says so and stops.
+You do not export, upload, tag or release. A change ready to ship says so and stops.
