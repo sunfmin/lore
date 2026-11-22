@@ -11,7 +11,7 @@ The repo's `gate.sh` defines "may land". Run it whole, as it is, before you hand
 
 ## README current
 
-The README says what the app is, what it keeps on the device, the Xcode it needs, and how to run the tests, the gate and the app in the simulator. When any of these changes, the README changes in the same change.
+The README says what the app is, what it keeps on the device, the Xcode it needs, and how to run the tests, the gate and the app in the simulator. When any of these changes, the README changes in the same change. The README keeps no list of what is built or measured: that is in the code's doc comments, the ADRs and the issue's comments, and a list that every change appends to is the line parallel changes conflict on (rollmind#12-#14 each conflicted there).
 
 ## Before you hand in
 
