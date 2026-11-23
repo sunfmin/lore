@@ -39,4 +39,4 @@ description: "Use when an iOS app runs models or processes the photo library: co
 - The simulator proves control flow only. Speed and memory are measured on the host (Apple silicon, same Core ML) or on a device:
   - latency as the median of repeated calls after a warm-up, with cold load measured separately;
   - peak memory with `/usr/bin/time -l` on a command-line run, or Instruments on a device.
-- Write the numbers, the machine and the command where the issue asks (usually a comment on it). Never write "fast" or "fits" without the number.
+- Post them where the issue asks (usually a comment on it).

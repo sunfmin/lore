@@ -14,6 +14,3 @@ why = "The machine's simulators are shared with other workers."
 rule = "Never commit model weights, compiled models, datasets or a real person's photos"
 why = "They are large, often licensed apart from the code, and private data must not reach git."
 
-[[prohibition]]
-rule = "Never make the app send user data off the device unless the spec or issue says so"
-why = "The device is the whole world: users trust the app with private data."
