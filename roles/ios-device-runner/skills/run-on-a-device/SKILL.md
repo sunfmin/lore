@@ -5,6 +5,17 @@ description: "Use to run an iOS app's tests, or the app itself, on a real iPhone
 
 # Running on a real iPhone
 
+`device-run.sh`, in this skill's directory, does every step below in one command. Use it, and read the steps when it fails or when the run needs something it does not do:
+
+```sh
+(eval "$(mytokens env apple-dev-signing)"; <skill dir>/device-run.sh --project <dir with project.yml> --scheme <scheme> \
+   --copy-in ~/.cache/<app>/models="Library/Application Support/<App>/models" --launch 120)
+```
+
+- `--install`, `--launch [seconds]` (console attached) or `--test [targets…]` (results and pictures back in `--out`, default `.build/device-run`).
+- `--copy-in <src>=<dest>` puts files the app reads (models, a sample library) into its data container without bundling them. Only changed files travel, so run it again after every build: an upgrade keeps the container. A source under `$HOME` lands at the same path on the phone's host, so a copy made there earlier is reused.
+- It finds the phone as below, signs in a keychain it removes on exit, and ends with one JSON line: the phone, its host, the action and its status. Exit 3 means no phone was found.
+
 Building is the slow part and running is not, so build on the fastest host you have, and only install and run on the host the phone is paired to.
 
 ## Find the phone
