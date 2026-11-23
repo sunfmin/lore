@@ -11,7 +11,7 @@ A **render test** draws a real screen of the app, the way the app draws it, insi
 - **its layout:** the frames of those elements;
 - **pixels:** only where words cannot say it, such as which end of a bar is white, or whether a board fills the width.
 
-It does not compare against a stored reference image. Why: a reference image breaks on every simulator or Xcode update and differs by machine architecture, and the assertions above hold across both. chessmirror's `App/ScreenTests` (its `ScreenImage`) is the working example of this pattern.
+It does not compare against a stored reference image. Why: a reference image breaks on every simulator or Xcode update and differs by machine architecture, and the assertions above hold across both.
 
 ## The harness (one small file per repo)
 
@@ -23,7 +23,7 @@ It does not compare against a stored reference image. Why: a reference image bre
   - writes `<repo>/…/out/<name>.png` (git-ignored);
   - returns the PNG's URL, the words (the accessibility labels and values, walked through views and elements together), and each word's frame;
   - hides the window afterwards.
-- SwiftUI builds no accessibility tree unless something is listening. chessmirror switches it on through a private symbol (`_AXSSetAutomationEnabled`, through `dlsym`). If you copy that, the harness fails the test when the switch is not found. It must never return an empty word list that silently passes `#expect(!says(…))` checks. Private symbols can vanish in any iOS release.
+- SwiftUI builds no accessibility tree unless something is listening. One way to switch it on is a private symbol (`_AXSSetAutomationEnabled`, through `dlsym`). If you copy that, the harness fails the test when the switch is not found. It must never return an empty word list that silently passes `#expect(!says(…))` checks. Private symbols can vanish in any iOS release.
 - Interact through accessibility (`accessibilityActivate()` on the element with that label), never by setting state behind the view's back.
 - Suites are `@MainActor` and `.serialized`: one key window at a time.
 

@@ -1,6 +1,6 @@
 # Render tests on the Mac
 
-The app-hosted render-test bundle also runs as an iOS app directly on an Apple Silicon Mac, with no simulator booted. On rollmind (15 render tests, Xcode 27.2), a warm build plus the run took 20 s, against 120–150 s on a fresh simulator. Use it for the narrow run while you work, and in the fast gate where the repo puts it there. The simulator run stays the authority: see "What only the simulator shows".
+The app-hosted render-test bundle also runs as an iOS app directly on an Apple Silicon Mac, with no simulator booted. A warm run takes seconds where a fresh simulator takes minutes. Use it for the narrow run while you work, and in the fast gate where the repo puts it there. The simulator run stays the authority: see "What only the simulator shows".
 
 ## Running
 
@@ -23,7 +23,7 @@ xcodebuild test -project <App.xcodeproj> -scheme <Scheme> \
   - add the keychain to the user search list.
   
   Over SSH the login keychain answers `User interaction is not allowed`, so do not import into it.
-- The p12 and the API key are the host's. The repo's script or the host's secret store names where they are; on Felix's hosts they are the mytokens entries `apple-development-p12` and `asc-api-key`. If the host has neither, escalate.
+- The p12 and the API key are the host's: the credentials this role's `services` name, handed to the run by `rolesmith env` (or the repo's script). If the host has none, escalate.
 - Use the certificate the host gives you. Xcode may offer to revoke the account's certificate "for this machine" and make a new one; revoking breaks every host that signs with it.
 
 ## Getting the pictures out
