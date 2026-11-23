@@ -163,7 +163,10 @@ if ! build; then
   if grep -q 'mobileprovision' "$DD/build.log"; then echo "device-run: profile not there yet; building again" >&2; build
   else grep -E 'error:' "$DD/build.log" | sort -u | tail -20 >&2; echo "device-run: build failed: $DD/build.log" >&2; exit 1; fi
 fi
-echo "APP=$(ls -d "$DD"/Build/Products/Debug-iphoneos/*.app | head -1)"
+# The app under test, not a UI test's <Target>-Runner.app, which sorts first when its name does (E2ETests-Runner before RollMind).
+app=$(ls -d "$DD"/Build/Products/Debug-iphoneos/*.app | grep -v -- '-Runner\.app$' | head -1 || true)
+[ -n "$app" ] || { echo "device-run: no app in $DD/Build/Products/Debug-iphoneos" >&2; exit 1; }
+echo "APP=$app"
 BUILD
 }
 verb=build; [ "$action" = test ] && verb=build-for-testing
