@@ -1,11 +1,19 @@
 ---
 name: run-on-a-device
-description: "Use to run an iOS app's tests, or the app itself, on a real iPhone: signing with the host's identity, building on your host, running on the host the phone is paired to (over SSH when that is another host), and getting the results and pictures back."
+description: "Use to run an iOS app's tests, or the app itself, on a real iPhone: finding the phone (this host first, then the hosts SSH reaches), signing with the host's identity, building on your host, running where the phone is paired, and getting the results and pictures back."
 ---
 
 # Running on a real iPhone
 
 Building is the slow part and running is not, so build on the fastest host you have, and only install and run on the host the phone is paired to.
+
+## Find the phone
+
+1. **Here.** `xcrun devicectl list devices` on your own host: a row with Reality `physical` and State `available (paired)` is a phone you can use. If there is one, use it and look no further: build and run in one step (below).
+2. **Over SSH**, only when none is paired here. Ask each host SSH reaches without a password (the `Host` entries of `~/.ssh/config`, or the hosts the issue names): `ssh -o BatchMode=yes -o ConnectTimeout=5 <host> xcrun devicectl list devices`. Take the first host with a physical, available, paired phone. A host that does not answer is skipped, not waited for.
+3. **None anywhere:** escalate, with the hosts you asked and what each answered.
+
+If the issue names a phone or a host, use that one. A phone that is shown but `unavailable` (locked, asleep, not trusted) needs a person, so escalate it the same way.
 
 ## Sign
 
@@ -22,7 +30,11 @@ Building is the slow part and running is not, so build on the fastest host you h
 - Build with `DEVELOPMENT_TEAM=<team> CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates` and the key (`-authenticationKeyPath/-authenticationKeyID/-authenticationKeyIssuerID`). Xcode then makes the team profile with no account login. A phone that is not yet registered needs a build naming it (`-destination id=<udid> -allowProvisioningDeviceRegistration`) once.
 - Xcode may say the account has a certificate "for this machine" whose key is not here, and offer to revoke it. Use the identity from the secret store instead.
 
-## Build here, run there
+## Phone paired here: one step
+
+`xcodebuild test -destination id=<udid> -only-testing:<targets> -derivedDataPath <dir> -resultBundlePath <bundle>`, plus the signing above. Then read the bundle as in step 4 below.
+
+## Phone on another host: build here, run there
 
 1. On your host: `xcodebuild build-for-testing -destination 'generic/platform=iOS' -only-testing:<targets> -derivedDataPath <dir>` plus the signing above. It writes `Build/Products/`: the signed `.app`, the test bundles and a `<Scheme>_iphoneos<ver>-arm64.xctestrun`.
 2. Copy `Build/Products/` to the phone's host: `tar` over `ssh`/`scp`, or `rsync` when the last run's copy is still there.
