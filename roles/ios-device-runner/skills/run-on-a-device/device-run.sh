@@ -12,7 +12,8 @@
 #   device-run.sh --project <dir with project.yml or .xcodeproj> --scheme <scheme> [options] <action>
 # Actions (one):
 #   --install                 install only
-#   --launch [seconds]        install, launch with the console attached for <seconds> (default 60)
+#   --launch [seconds]        install, launch with the console attached for <seconds> (default 60);
+#                             the app keeps running after
 #   --test [target ...]       build-for-testing, run the tests on the phone (all, or -only-testing targets)
 # Options:
 #   --udid <udid>             the phone (default: the first physical, available, paired one found)
@@ -249,7 +250,10 @@ case $action in
   install) ;;
   launch)
     a=""; for x in ${args[@]+"${args[@]}"}; do a="$a $(q "$x")"; done
-    run_detached "perl -e 'alarm shift; exec @ARGV' $launch_secs xcrun devicectl device process launch --device $udid --console --terminate-existing $bundle$a; true" \
+    # The console detaches after launch_secs and the app keeps running. devicectl forwards the signals
+    # it can catch to the app (an alarm's SIGALRM killed it: "App terminated due to signal 14"), so it
+    # is stopped with SIGKILL, which it cannot forward.
+    run_detached "xcrun devicectl device process launch --device $udid --console --terminate-existing $bundle$a & p=\$!; i=0; while [ \$i -lt $launch_secs ] && kill -0 \$p 2>/dev/null; do sleep 1; i=\$((i+1)); done; kill -9 \$p 2>/dev/null; wait \$p; true" \
       $(( launch_secs + 120 )) || status=$?
     say "console: $out/run.log" ;;
   test)
