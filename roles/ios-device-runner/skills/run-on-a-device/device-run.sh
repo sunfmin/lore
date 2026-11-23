@@ -23,6 +23,8 @@
 #                             Repeatable. Only changed files travel (rsync, then devicectl copy to).
 #                             A source written there:<path> is a path on the phone's host; nothing is sent.
 #   --arg <arg>               a launch argument for --launch. Repeatable.
+#   --configuration <name>    Debug (default) or Release; timings mean little in Debug. --test in Release
+#                             builds with ENABLE_TESTABILITY=YES so @testable imports compile
 #   --team <team id>          overrides APPLE_DEV_TEAM
 #   --build-there             build on the phone's host instead of here: --project is then a path there
 #                             (a checkout of the same source). Only the result comes back; nothing is copied there.
@@ -30,16 +32,17 @@
 # Exit: 0 when the action passed; 1 when it failed; 2 usage; 3 no phone found.
 set -euo pipefail
 
-usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+usage() { sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'; exit 2; }
 say() { printf 'device-run: %s\n' "$*" >&2; }
 die() { say "$*"; exit 1; }
 
-project= scheme= udid= host= build_there= action= launch_secs=60 team=${APPLE_DEV_TEAM:-} out=./.build/device-run
+project= scheme= config=Debug udid= host= build_there= action= launch_secs=60 team=${APPLE_DEV_TEAM:-} out=./.build/device-run
 copies=() args=() tests=()
 while [ $# -gt 0 ]; do
   case $1 in
     --project) project=$2; shift 2 ;;
     --scheme) scheme=$2; shift 2 ;;
+    --configuration) config=$2; shift 2 ;;
     --udid) udid=$2; shift 2 ;;
     --host) host=$2; shift 2 ;;
     --copy-in) copies+=("$2"); shift 2 ;;
@@ -153,8 +156,8 @@ if [ -f project.yml ]; then xcodegen generate --quiet; fi
 container=(-project "$(ls -d *.xcodeproj | head -1)"); ls -d *.xcworkspace >/dev/null 2>&1 && container=(-workspace "$(ls -d *.xcworkspace | head -1)")
 mkdir -p "$DD"
 only=(); for t in $ONLY; do only+=("-only-testing:$t"); done
-build() { xcodebuild "${container[@]}" -scheme "$SCHEME" -configuration Debug -destination "$DEST" -derivedDataPath "$DD" \
-            ${only[@]+"${only[@]}"} DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic OTHER_CODE_SIGN_FLAGS="--keychain $kc" \
+build() { xcodebuild "${container[@]}" -scheme "$SCHEME" -configuration "$CONFIG" -destination "$DEST" -derivedDataPath "$DD" \
+            ${only[@]+"${only[@]}"} ${TESTABLE:+ENABLE_TESTABILITY=YES} DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic OTHER_CODE_SIGN_FLAGS="--keychain $kc" \
             -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
             -authenticationKeyPath "$keys/asc.p8" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             "$VERB" > "$DD/build.log" 2>&1; }
@@ -164,12 +167,13 @@ if ! build; then
   else grep -E 'error:' "$DD/build.log" | sort -u | tail -20 >&2; echo "device-run: build failed: $DD/build.log" >&2; exit 1; fi
 fi
 # The app under test, not a UI test's <Target>-Runner.app, which sorts first when its name does (E2ETests-Runner before RollMind).
-app=$(ls -d "$DD"/Build/Products/Debug-iphoneos/*.app | grep -v -- '-Runner\.app$' | head -1 || true)
-[ -n "$app" ] || { echo "device-run: no app in $DD/Build/Products/Debug-iphoneos" >&2; exit 1; }
+app=$(ls -d "$DD"/Build/Products/$CONFIG-iphoneos/*.app | grep -v -- '-Runner\.app$' | head -1 || true)
+[ -n "$app" ] || { echo "device-run: no app in $DD/Build/Products/$CONFIG-iphoneos" >&2; exit 1; }
 echo "APP=$app"
 BUILD
 }
 verb=build; [ "$action" = test ] && verb=build-for-testing
+testable=; [ "$action" = test ] && [ "$config" != Debug ] && testable=1
 only_list=${tests[*]+"${tests[*]}"}
 there=; [ -n "$build_there" ] && [ -n "$host" ] && there=1
 if [ -n "$there" ]; then
@@ -177,8 +181,8 @@ if [ -n "$there" ]; then
 else
   dd_there=$out/DerivedData; dest="id=$udid"; [ -n "$host" ] && dest='generic/platform=iOS'
 fi
-envs=$(printf 'export APPLE_DEV_P12_B64=%q APPLE_DEV_P12_PASSWORD=%q ASC_KEY_ID=%q ASC_ISSUER_ID=%q ASC_PRIVATE_KEY_B64=%q TEAM=%q PROJ=%q SCHEME=%q DEST=%q VERB=%q ONLY=%q DD=%q\n' \
-  "$APPLE_DEV_P12_B64" "$APPLE_DEV_P12_PASSWORD" "$ASC_KEY_ID" "$ASC_ISSUER_ID" "$ASC_PRIVATE_KEY_B64" "$team" "$project" "$scheme" "$dest" "$verb" "$only_list" "$dd_there")
+envs=$(printf 'export APPLE_DEV_P12_B64=%q APPLE_DEV_P12_PASSWORD=%q ASC_KEY_ID=%q ASC_ISSUER_ID=%q ASC_PRIVATE_KEY_B64=%q TEAM=%q PROJ=%q SCHEME=%q DEST=%q VERB=%q ONLY=%q DD=%q CONFIG=%q TESTABLE=%q\n' \
+  "$APPLE_DEV_P12_B64" "$APPLE_DEV_P12_PASSWORD" "$ASC_KEY_ID" "$ASC_ISSUER_ID" "$ASC_PRIVATE_KEY_B64" "$team" "$project" "$scheme" "$dest" "$verb" "$only_list" "$dd_there" "$config" "$testable")
 s=$(date +%s)
 # The credentials travel on stdin, never in a command line another user could read.
 if [ -n "$there" ]; then built=$( { echo "$envs"; build_script; } | ssh -o BatchMode=yes "$host" 'bash -s') || die "build on $host failed"
@@ -197,7 +201,7 @@ else
     remote=.cache/device-run/$bundle
     ssh -o BatchMode=yes "$host" "mkdir -p $remote/products $remote/in"
     rsync -a --delete "$products/" "$host:$remote/products/"
-    rapp=$remote/products/Debug-iphoneos/$(basename "$app"); rproducts=$remote/products
+    rapp=$remote/products/$config-iphoneos/$(basename "$app"); rproducts=$remote/products
   else
     remote=; rapp=$app; rproducts=$products
   fi
