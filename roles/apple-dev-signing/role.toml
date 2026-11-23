@@ -1,2 +1,2 @@
 description = "Development-signs Apple builds unattended with the host's identity and App Store Connect key, in a keychain the run makes and removes; used by roles that run on a Mac or a phone"
-services = ["apple-development-p12", "asc-api-key"]
+services = ["apple-dev-signing"]

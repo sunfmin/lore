@@ -7,7 +7,7 @@ description: "Use before any xcodebuild that must be development-signed (an iOS 
 
 ## The run's keychain
 
-1. Write the p12 and the `.p8` from the credentials into a directory only you can read (`umask 077`).
+1. Write the p12 and the `.p8` from the credentials (`APPLE_DEV_P12_B64`, `ASC_PRIVATE_KEY_B64`, base64) into a directory only you can read (`umask 077`).
 2. `security create-keychain -p <random> <kc>`, then `set-keychain-settings <kc>` and `unlock-keychain -p <random> <kc>`.
 3. `security import <p12> -k <kc> -P <password> -T /usr/bin/codesign`.
 4. `security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k <random> <kc>`.
