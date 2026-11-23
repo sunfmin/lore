@@ -17,26 +17,15 @@ If the issue names a phone or a host, use that one. A phone that is shown but `u
 
 ## Sign
 
-- Use the credentials this role's `services` name, handed to the run by `rolesmith env`:
-  - an Apple Development certificate with its private key, as a p12 and its password;
-  - an App Store Connect API key: its key ID, issuer ID and `.p8`.
-- Import the p12 into a keychain the run makes for itself:
-  - `security create-keychain`, `set-keychain-settings` and `unlock-keychain`;
-  - `security import … -T /usr/bin/codesign`;
-  - `security set-key-partition-list -S apple-tool:,apple:,codesign:`;
-  - add it to the user search list.
-  
-  Over SSH the login keychain answers `User interaction is not allowed`. Remove the keychain and every key file on exit (a `trap`).
-- Build with `DEVELOPMENT_TEAM=<team> CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates` and the key (`-authenticationKeyPath/-authenticationKeyID/-authenticationKeyIssuerID`). Xcode then makes the team profile with no account login. A phone that is not yet registered needs a build naming it (`-destination id=<udid> -allowProvisioningDeviceRegistration`) once.
-- Xcode may say the account has a certificate "for this machine" whose key is not here, and offer to revoke it. Use the identity from the secret store instead.
+The build is development-signed: the skill sign-for-development of the role apple-dev-signing gives the keychain and the flags. A phone not yet registered needs one build naming it (`-destination id=<udid> -allowProvisioningDeviceRegistration`). The run on the phone's host needs no signing.
 
 ## Phone paired here: one step
 
-`xcodebuild test -destination id=<udid> -only-testing:<targets> -derivedDataPath <dir> -resultBundlePath <bundle>`, plus the signing above. Then read the bundle as in step 4 below.
+`xcodebuild test -destination id=<udid> -only-testing:<targets> -derivedDataPath <dir> -resultBundlePath <bundle>`, plus the signing flags. Then read the bundle as in step 4 below.
 
 ## Phone on another host: build here, run there
 
-1. On your host: `xcodebuild build-for-testing -destination 'generic/platform=iOS' -only-testing:<targets> -derivedDataPath <dir>` plus the signing above. It writes `Build/Products/`: the signed `.app`, the test bundles and a `<Scheme>_iphoneos<ver>-arm64.xctestrun`.
+1. On your host: `xcodebuild build-for-testing -destination 'generic/platform=iOS' -only-testing:<targets> -derivedDataPath <dir>` plus the signing flags. It writes `Build/Products/`: the signed `.app`, the test bundles and a `<Scheme>_iphoneos<ver>-arm64.xctestrun`.
 2. Copy `Build/Products/` to the phone's host: `tar` over `ssh`/`scp`, or `rsync` when the last run's copy is still there.
 3. On the phone's host: `xcodebuild test-without-building -xctestrun <file>.xctestrun -destination id=<udid> -resultBundlePath <bundle>`. No signing is needed there.
 4. Read the result there: `xcrun xcresulttool get test-results summary --path <bundle> --compact`. Bring back the summary and `xcresulttool export attachments --path <bundle> --output-path <dir>`. In that directory, `manifest.json` maps each exported file to its test and its name.
@@ -47,7 +36,7 @@ The phone must be paired to the host that runs step 3. Xcode's "Connect via netw
 
 ## Pictures from a phone
 
-A test on the phone cannot write into the repo: the bundle runs in the app's sandbox on the phone. The test writes in the app's temporary directory, and records each PNG as a Swift Testing attachment: `Attachment.record(pngData, named: "<name>.png")`, with `pngData` as `Data` and `import Foundation` in the file. The pictures leave through the result bundle (step 4).
+The test bundle runs in the app's sandbox on the phone. The harness writes and attaches its pictures as the skill render-screens of ios-app-coder says under "Off the simulator", and they leave through the result bundle (step 4).
 
 ## What to report
 

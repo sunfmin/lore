@@ -1,3 +1,2 @@
-description = "Runs an iOS app, its tests and its measurements on a real iPhone, also one paired to another host reached over SSH; added beside a role that builds the app"
+description = "Runs an iOS app, its tests and its measurements on a real iPhone, on this host or one SSH reaches; added beside ios-app-coder, with apple-dev-signing"
 programs = ["xcodegen"]
-services = ["apple-development-p12", "asc-api-key"]

@@ -1,0 +1,1 @@
+description = "Runs an iOS app's render tests as an iOS app on the Mac, with no simulator, for a fast first pass; added beside ios-app-coder, with apple-dev-signing"

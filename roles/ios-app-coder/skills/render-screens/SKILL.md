@@ -57,11 +57,19 @@ Do not multiply every row by every other. Cover each row once, and add combinati
 
 After the run, open each PNG of the screens your change touched. In the hand-in, write one plain line per picture saying what it shows. That line is evidence, not a verdict. A picture that contradicts its assertions (blank, clipped, the wrong screen) is a failure to fix, even when the test passed. A model's opinion of a picture is never the gate.
 
+## Off the simulator
+
+On the Mac and on a phone the test bundle runs in the app's sandbox, so it cannot write into the repo. When the test runs off the simulator (`#if !targetEnvironment(simulator)`), the harness:
+
+- writes each PNG under `URL.temporaryDirectory`, so its own file checks still hold;
+- records each PNG as a Swift Testing attachment: `Attachment.record(pngData, named: "<name>.png")`, with `pngData` as `Data` and `import Foundation` in the file. Attaching the `UIImage` compiles, but off the simulator the bundle then fails to load (`Symbol not found … AttachableAsImage … _Testing_UIKit`).
+
+The pictures then leave through the result bundle: `xcrun xcresulttool export attachments --path <bundle> --output-path <dir>`.
+
 ## In the gate
 
 - Render tests that no gate runs rot. The gate builds the app-hosted bundle and runs it: `xcodebuild test -only-testing:<RenderTarget>`, on a device by id, with its own `-derivedDataPath` and `-resultBundlePath` (see the skill build-and-test).
-- The render tests also run as an iOS app directly on the Mac, signed for development, with no simulator, in seconds. Use that for the narrow run while you work and, where the repo puts it there, in the fast gate. The simulator run stays in the slow gate: the Mac does not show Dynamic Type sizes, the phone's shape or XCUITest. How, and how the pictures get out of the app's sandbox: [on-the-mac.md](on-the-mac.md).
-- If the render tests make the fast gate too slow on a simulator, they go in the slow gate, and the fast gate keeps the package's tests (and the Mac run, where the repo has one).
+- If the render tests make the fast gate too slow, they go in the slow gate, and the fast gate keeps the package's tests. (Where the role ios-render-on-mac is in use, a first pass on the Mac can stay in the fast gate.)
 - A few XCUITest journeys belong in the slow gate too, each calling `try app.performAccessibilityAudit()` on the screens it reaches. The audit finds clipped text, Dynamic Type breakage, contrast problems and small hit regions without any reference image.
 
 ## Reference-image snapshots (only when the repo opts in)
