@@ -8,8 +8,8 @@ description: "Use to run an iOS app's tests, or the app itself, on a real iPhone
 `device-run.sh`, in this skill's directory, does every step below in one command. Use it, and read the steps when it fails or when the run needs something it does not do:
 
 ```sh
-(eval "$(mytokens env apple-dev-signing)"; <skill dir>/device-run.sh --project <dir with project.yml> --scheme <scheme> \
-   --copy-in ~/.cache/<app>/models="Library/Application Support/<App>/models" --launch 120)
+rolesmith env apple-dev-signing -- <skill dir>/device-run.sh --project <dir with project.yml> --scheme <scheme> \
+   --copy-in ~/.cache/<app>/models="Library/Application Support/<App>/models" --launch 120
 ```
 
 - `--install`, `--launch [seconds]` (console attached) or `--test [targets…]` (results and pictures back in `--out`, default `.build/device-run`).
