@@ -1,0 +1,5 @@
+description = "Proves a Rust repo's pure crates with Flux refinement types, bounds and order, with no exemptions; added beside a Rust coding role where the repo checks its crates with Flux"
+requires = ["coder"]
+
+[match]
+contains = [{ file = "Cargo.toml", text = "flux" }]

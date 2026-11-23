@@ -1,0 +1,7 @@
+[[prohibition]]
+rule = "Never force-push or rewrite a branch others have"
+why = "A force push rewrites history others build on."
+
+[[prohibition]]
+rule = "Never push to the repo's base branch"
+why = "Work reaches the base only the way the process that started you lands it."

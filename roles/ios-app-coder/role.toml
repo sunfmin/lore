@@ -1,4 +1,5 @@
 description = "Builds and changes iOS apps in Swift and SwiftUI: logic in a host-testable package, proved through the repo's gate"
+requires = ["coder"]
 programs = ["xcodegen"]
 
 [match]

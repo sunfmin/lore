@@ -1,8 +1,4 @@
 [[prohibition]]
-rule = "Never force-push or rewrite a branch others have"
-why = "A force push rewrites history others build on."
-
-[[prohibition]]
 rule = "Never upload a build (`xcrun altool`, `xcrun iTMSTransporter`, `xcodebuild -exportArchive` to App Store Connect), or tag or publish a release"
 why = "A build uploaded or a release published cannot be taken back; releasing is not this role's."
 

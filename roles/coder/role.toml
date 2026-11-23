@@ -1,0 +1,43 @@
+description = "Changes code in a repo unattended, whatever its language: deep modules, one home per fact, red first, the repo's own words, and its gate as done. Other coding roles require it"
+
+[[skill]]
+name = "codebase-design"
+url = "https://github.com/mattpocock/skills"
+path = "skills/engineering/codebase-design"
+rev = "abeeaf95660ba9e8b7c753eb38f441ca707a8823"
+
+[[skill]]
+name = "tdd"
+url = "https://github.com/mattpocock/skills"
+path = "skills/engineering/tdd"
+rev = "abeeaf95660ba9e8b7c753eb38f441ca707a8823"
+
+[[skill]]
+name = "diagnosing-bugs"
+url = "https://github.com/mattpocock/skills"
+path = "skills/engineering/diagnosing-bugs"
+rev = "abeeaf95660ba9e8b7c753eb38f441ca707a8823"
+
+[[skill]]
+name = "domain-modeling"
+url = "https://github.com/mattpocock/skills"
+path = "skills/engineering/domain-modeling"
+rev = "abeeaf95660ba9e8b7c753eb38f441ca707a8823"
+
+[[skill]]
+name = "writing-for-agents"
+url = "https://github.com/mattpocock/skills"
+path = "skills/productivity/writing-for-agents"
+rev = "abeeaf95660ba9e8b7c753eb38f441ca707a8823"
+
+[[skill]]
+name = "complexity-review"
+url = "https://github.com/sunfmin/product-team"
+path = "roles/reviewer/.claude/skills/complexity-review"
+rev = "3e5182cb686249a117544175fbcedacb4a20c4f7"
+
+[[skill]]
+name = "single-source-of-truth"
+url = "https://github.com/sunfmin/product-team"
+path = "roles/reviewer/.claude/skills/single-source-of-truth"
+rev = "3e5182cb686249a117544175fbcedacb4a20c4f7"

@@ -1,0 +1,3 @@
+[[prohibition]]
+rule = "Never run `cargo publish`"
+why = "A crate published to a registry cannot be taken back; a tool ships only through its repo's release process."
