@@ -253,6 +253,7 @@ case $action in
   install) ;;
   launch)
     a=""; for x in ${args[@]+"${args[@]}"}; do a="$a $(q "$x")"; done
+    [ -z "$a" ] || a=" --$a"   # after --, devicectl reads no app argument (e.g. -caption-bench) as its own option
     # The console detaches after launch_secs and the app keeps running. devicectl forwards the signals
     # it can catch to the app (an alarm's SIGALRM killed it: "App terminated due to signal 14"), so it
     # is stopped with SIGKILL, which it cannot forward.
