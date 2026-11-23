@@ -1,5 +1,6 @@
 description = "Builds and changes Rust command-line tools that an AI agent reads first, the agent-cli way: pure crates, a thin effect crate, help as the manual, one JSON object on stdout"
 requires = ["coder"]
+programs = ["rustup"]
 
 [[skill]]
 name = "agent-cli"

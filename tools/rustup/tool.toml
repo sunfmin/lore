@@ -1,0 +1,16 @@
+description = "rustup: installs the Rust toolchain each repo pins in its rust-toolchain.toml, and the cargo that builds with it"
+check = "rustup --version"
+[install]
+# The pinned rustup-init for this Mac's architecture, into ~/.cargo and ~/.rustup, no toolchain of
+# its own (each repo's rust-toolchain.toml names one, and rustup installs it on first use), no shell
+# rc edited, and no self-update, so the check keeps showing the pin.
+script = """
+set -e
+arch=$(uname -m); [ "$arch" = arm64 ] && arch=aarch64
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+curl --proto '=https' --tlsv1.2 -fsSL -o "$tmp/rustup-init" "https://static.rust-lang.org/rustup/archive/1.29.3/$arch-apple-darwin/rustup-init"
+chmod +x "$tmp/rustup-init"
+"$tmp/rustup-init" -y --no-modify-path --default-toolchain none
+"$HOME/.cargo/bin/rustup" set auto-self-update disable
+"""
+version = "1.29.3"

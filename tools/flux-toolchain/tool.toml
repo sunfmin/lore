@@ -1,0 +1,5 @@
+description = "Flux refinement type checker for Rust (cargo flux), with liquid-fixpoint and z3"
+check = "cargo flux --version"
+[install]
+brew = "sunfmin/tap/flux-toolchain"
+version = "2026.11.22"
