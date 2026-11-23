@@ -7,10 +7,6 @@ rule = "Never upload a build (`xcrun altool`, `xcrun iTMSTransporter`, `xcodebui
 why = "A build uploaded or a release published cannot be taken back; releasing is not this role's."
 
 [[prohibition]]
-rule = "Never remove, erase or change anything on a physical device but the app you built (no other app, no setting, no `xcrun devicectl device erase`)"
-why = "The device is a person's own phone, holding their data."
-
-[[prohibition]]
 rule = "Never delete, erase or shut down a simulator you did not create"
 why = "The machine's simulators are shared with other workers."
 

@@ -1,0 +1,11 @@
+[[prohibition]]
+rule = "Never remove, erase or change anything on a physical device but the app you installed (no other app, no setting, no `xcrun devicectl device erase`)"
+why = "The device is a person's own phone, holding their data."
+
+[[prohibition]]
+rule = "Never revoke a signing certificate, even when Xcode offers to make a new one"
+why = "Other hosts sign with it; revoking breaks every one of them."
+
+[[prohibition]]
+rule = "Never write a signing identity or key into the login keychain, the repo, a log or a file that outlives the run"
+why = "A key left behind is a key leaked; the host's secret store is its one home."
