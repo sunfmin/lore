@@ -5,13 +5,13 @@ description: "Use to run an iOS app's tests, or the app itself, on a real iPhone
 
 # Running on a real iPhone
 
-Measured on rollmind (2026-11-23): building on macnoMac-Studio took 32 s, copying the 43 MB of products to FelixMBAirM1 took 42 s, and running 22 tests on its iPhone 17 Pro Max took 60 s. The same build on the slower host is several minutes, so build on the fast host and run where the phone is.
+Building is the slow part and running is not, so build on the fastest host you have, and only install and run on the host the phone is paired to.
 
 ## Sign
 
-- Use the identity the host's secret store holds. On Felix's hosts that is mytokens:
-  - `apple-development-p12`: fields `P12 (base64)` and `P12 password`, an Apple Development certificate and its key;
-  - `asc-api-key`: fields `Key ID`, `Issuer ID` and `Key (base64 .p8)`.
+- Use the credentials this role's `services` name, handed to the run by `rolesmith env`:
+  - an Apple Development certificate with its private key, as a p12 and its password;
+  - an App Store Connect API key: its key ID, issuer ID and `.p8`.
 - Import the p12 into a keychain the run makes for itself:
   - `security create-keychain`, `set-keychain-settings` and `unlock-keychain`;
   - `security import … -T /usr/bin/codesign`;

@@ -7,11 +7,11 @@ description: "Use before handing in a change to an iOS app: the green gate, the 
 
 ## Green gate
 
-The repo's `gate.sh` defines "may land". Run it whole, as it is, before you hand in: running parts of it by hand is not the gate. Its scripts are committed executable (`100755`). When the gate runs `slimfit check`, the records it asks for (growth, mutants, or `--no-mutants "<why>"` where the preset has no mutants tool) are part of the change. When it fails for something outside your scope (a missing Xcode or runtime, a test another change broke), escalate with what you ran and what it printed. Do not work around it.
+The repo's `gate.sh` defines "may land". Run it whole, as it is, before you hand in: running parts of it by hand is not the gate. Its scripts are committed executable (`100755`). Records the gate asks the change to write (a baseline, a ratchet, a stated reason) are part of the change. When it fails for something outside your scope (a missing Xcode or runtime, a test another change broke), escalate with what you ran and what it printed. Do not work around it.
 
 ## README current
 
-The README says what the app is, what it keeps on the device, the Xcode it needs, and how to run the tests, the gate and the app in the simulator. When any of these changes, the README changes in the same change. The README keeps no list of what is built or measured: that is in the code's doc comments, the ADRs and the issue's comments, and a list that every change appends to is the line parallel changes conflict on (rollmind#12-#14 each conflicted there).
+The README says what the app is, what it keeps on the device, the Xcode it needs, and how to run the tests, the gate and the app in the simulator. When any of these changes, the README changes in the same change. The README keeps no list of what is built or measured: that is in the code's doc comments, the ADRs and the issue's comments, and a list that every change appends to is the line parallel changes conflict on.
 
 ## Before you hand in
 

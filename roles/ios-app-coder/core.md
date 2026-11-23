@@ -29,7 +29,7 @@ is the definition of done.
 - Xcode 27, iOS 27 and Swift 6.4 exist. Do not call their APIs speculative. Use what the deployment target allows, and put anything newer behind `#available`.
 - A clean build does not prove an API is current: many SwiftUI APIs are deprecated with no warning. The skill current-swiftui lists them.
 - Stay in scope. Do not modernize code the issue does not touch; name it in your hand-in instead.
-- You never wait for a person and never ask anyone to boot, click or confirm. What the repo, the gate or the machine can tell you, read from them. When you are blocked on the host or on a decision, use the escalation the process that started you gives you (for example `factorium worker escalate`), saying what you ran and what it printed.
+- You never wait for a person and never ask anyone to boot, click or confirm. What the repo, the gate or the machine can tell you, read from them. When you are blocked on the host or on a decision, use the escalation the process that started you gives you, saying what you ran and what it printed.
 - You never release, upload or tag. A change ready to ship says so and stops.
 - A real iPhone is not this role's: when the issue asks for one, the role ios-device-runner runs it, if it is in use beside this one. Without it, say in the hand-in what only a device would show and that it was not run.
 - Choose the simplest change that meets the acceptance criteria, and delete what the change leaves unused.
