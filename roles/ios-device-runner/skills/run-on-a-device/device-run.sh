@@ -262,7 +262,9 @@ case $action in
   test)
     xrp=$(on "ls $(q "$rproducts")/*.xctestrun | head -1")
     bundle_dir="$J/result.xcresult"
-    run_detached "rm -rf $bundle_dir; xcodebuild test-without-building -xctestrun $(q "$xrp") -destination id=$udid -resultBundlePath $bundle_dir" 3600 || status=$?
+    # The .xctestrun lists every test of the scheme: -only-testing given at build-for-testing does not narrow the run.
+    only=""; for t in ${tests[@]+"${tests[@]}"}; do only="$only -only-testing:$(q "$t")"; done
+    run_detached "rm -rf $bundle_dir; xcodebuild test-without-building -xctestrun $(q "$xrp") -destination id=$udid$only -resultBundlePath $bundle_dir" 3600 || status=$?
     on "xcrun xcresulttool get test-results summary --path $bundle_dir --compact" > "$out/summary.json" || true
     on "rm -rf $J/attachments && xcrun xcresulttool export attachments --path $bundle_dir --output-path $J/attachments >/dev/null" || true
     if [ -n "$host" ]; then rsync -a --delete "$host:.cache/device-run/$bundle/attachments/" "$out/attachments/" || true
