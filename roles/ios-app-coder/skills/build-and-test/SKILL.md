@@ -21,7 +21,8 @@ description: "Use on every change to an iOS app, and first when something is rep
 - See a test fail before writing the code that makes it pass. It must fail on its own `#expect`, not on a build error. A bug starts from a test that fails the way it was reported.
 - Run the cheapest test that covers the change:
   - package code: `swift test --filter <Suite>/<test>` on the host, with no simulator;
-  - app code or a UI test: `xcodebuild test -only-testing:<target>/<suite>/<test>`.
+  - a render test: on the Mac destination first, with no simulator (the skill render-screens, `on-the-mac.md`), then on the simulator when the change touches text sizes, safe areas or the phone's width;
+  - other app code or a UI test: `xcodebuild test -only-testing:<target>/<suite>/<test>` on the simulator.
   - Then run the whole gate before you hand in.
 - In a worktree, give every xcodebuild run its own `-derivedDataPath`, `-clonedSourcePackagesDirPath` and `-resultBundlePath` inside the worktree, and a destination by `id=`. Worktrees that share DerivedData, the package cache or a simulator overwrite each other's builds and app sandboxes.
 - Keep the log short and the failure exact. Pipe xcodebuild through `xcbeautify --quieter` when the repo has it, else `grep -E 'error:|warning:|failed|passed'`, and keep the full log in a file. Read a failure from the result bundle (`xcrun xcresulttool get test-results summary` / `test-details --test-id <id>`), never from the tail of the log.
@@ -30,7 +31,7 @@ description: "Use on every change to an iOS app, and first when something is rep
 ## The simulator
 
 - The gate names or picks its destination, and a run by hand uses the same device, by id. Pick devices from `xcrun simctl list devices available --json`, never a hard-coded name. When none fits, create one (`xcrun simctl create <name> <devicetype> <runtime>`), use it by id, and delete only devices you created.
-- Simulator builds need no signing identity. When one is asked for, the project or the gate is wrong: the fix is `CODE_SIGNING_ALLOWED=NO` for simulator builds, never a certificate.
+- Simulator builds need no signing identity. When a simulator build asks for one, the project or the gate is wrong: the fix is `CODE_SIGNING_ALLOWED=NO` for simulator builds, never a certificate. Development signing is only for the Mac destination and a physical device.
 - A missing runtime, a device that will not boot, or a broken Xcode is the host's problem, not yours. Escalate it with what you ran and what it printed. Do not change the gate to get around it.
 
 ## A physical device

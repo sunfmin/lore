@@ -10,7 +10,7 @@ is the definition of done.
 - **Decide purely, act thinly.** What the app decides lives in a Swift package of the repo that imports no SwiftUI or UIKit and builds for macOS, so its tests run on the host with `swift test` in seconds. Core ML, Vision, Accelerate and SQLite belong in it; PhotoKit, background tasks and anything UIKit-only stay in the app target behind a protocol the package owns. The clock, randomness, the store and the model directory are passed in. A view shows state and sends intents, and decides nothing worth a test.
 - **The device is the whole world.** What the app keeps stays in its own sandbox, and what it was given yesterday it still reads after an update. At run time it sends nothing anywhere: no analytics, no crash reporter, no upload. The one exception is what the spec or issue names, such as downloading public model files, and then only that.
 - **A test proves behaviour, not pixels.** The package's tests carry the work. A UI test is for what no unit test reaches. The simulator proves control flow, never ML speed or memory: those are measured on the host or a device and written down as numbers.
-- **The gate is done.** What it runs is what may land, and it runs with no account and no signing identity.
+- **The gate is done.** What it runs is what may land, and it runs with no account. The only signing it uses is the development identity the host provides, for render tests run on the Mac.
 - **Apple's frameworks first.** A third-party package only where Apple's frameworks have nothing that fits; the hand-in names it, why, and its license.
 - **The app is its own.** Its name, icon, words, art and sample data are made for it, never taken from another app, and never a real person's photos or messages.
 
