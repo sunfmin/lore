@@ -2,4 +2,4 @@ description = "Flux refinement type checker for Rust (cargo flux), with liquid-f
 check = "cargo flux --version"
 [install]
 brew = "sunfmin/tap/flux-toolchain"
-version = "2026.11.22"
+version = "stable"                            # follows the tap: the toolchain publishes daily

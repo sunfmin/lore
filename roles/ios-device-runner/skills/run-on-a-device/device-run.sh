@@ -4,7 +4,7 @@
 # the result back. The steps are the skill run-on-a-device's; signing is apple-dev-signing's.
 #
 # Credentials come from the environment: run it as
-#   (eval "$(mytokens env apple-dev-signing)"; device-run.sh …)
+#   rolesmith env apple-dev-signing -- device-run.sh …
 # APPLE_DEV_P12_B64, APPLE_DEV_P12_PASSWORD, ASC_KEY_ID, ASC_ISSUER_ID, ASC_PRIVATE_KEY_B64, and
 # APPLE_DEV_TEAM (or --team).
 #
@@ -57,7 +57,7 @@ done
 [ -n "$project" ] && [ -n "$scheme" ] && [ -n "$action" ] || usage
 [ -n "$team" ] || die "no team: set APPLE_DEV_TEAM or pass --team"
 for v in APPLE_DEV_P12_B64 APPLE_DEV_P12_PASSWORD ASC_KEY_ID ASC_ISSUER_ID ASC_PRIVATE_KEY_B64; do
-  [ -n "${!v:-}" ] || die "$v is not set: run under (eval \"\$(mytokens env apple-dev-signing)\"; …)"
+  [ -n "${!v:-}" ] || die "$v is not set: run under rolesmith env apple-dev-signing -- …"
 done
 mkdir -p "$out"; out=$(cd "$out" && pwd)
 [ -n "$build_there" ] || project=$(cd "$project" && pwd)   # with --build-there it is a path on the phone's host
