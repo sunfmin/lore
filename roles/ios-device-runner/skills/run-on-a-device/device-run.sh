@@ -1,7 +1,9 @@
 #!/bin/bash
-# device-run.sh: build an iOS app signed on this host, put it on a real iPhone (paired here, or to a
-# host SSH reaches), copy files into its data container, then launch it or run its tests, and bring
-# the result back. The steps are the skill run-on-a-device's; signing is apple-dev-signing's.
+# device-run.sh: build an iOS app signed on the host its iPhone is paired to (here, or a host SSH
+# reaches), put it on the phone, copy files into its data container, then launch it or run its tests,
+# and bring the result back. The steps are the skill run-on-a-device's; signing is apple-dev-signing's.
+# A phone on another host gets this checkout's source sent there and built there; only small files
+# leave this host, never model weights (download those on the phone's host and pass there:<path>).
 #
 # Credentials come from the environment: run it as
 #   rolesmith env apple-dev-signing -- device-run.sh …
@@ -11,6 +13,7 @@
 # Usage:
 #   device-run.sh --project <dir with project.yml or .xcodeproj> --scheme <scheme> [options] <action>
 # Actions (one):
+#   --build                   build only, on the phone's host; nothing reaches the phone
 #   --install                 install only
 #   --launch [seconds]        install, launch with the console attached for <seconds> (default 60);
 #                             the app keeps running after
@@ -18,18 +21,25 @@
 # Options:
 #   --udid <udid>             the phone (default: the first physical, available, paired one found)
 #   --host <ssh host>         the host the phone is paired to (default: here first, then ~/.ssh/config hosts)
-#   --copy-in <src>=<dest>    copy <src> (a file or directory on this host) to <dest> in the app's
-#                             data container, e.g. ~/.cache/x/models="Library/Application Support/X/models".
-#                             Repeatable. Only changed files travel (rsync, then devicectl copy to).
-#                             A source written there:<path> is a path on the phone's host; nothing is sent.
+#   --copy-in <src>=<dest>    copy <src> to <dest> in the app's data container, e.g.
+#                             there:.cache/x/models="Library/Application Support/X/models". Repeatable.
+#                             there:<path> is a path on the phone's host (relative to its home); nothing
+#                             is sent. A plain <src> is on this host; with the phone on another host it
+#                             travels by rsync and must be under 100 MB (weights: download them there).
 #   --arg <arg>               a launch argument for --launch. Repeatable.
 #   --configuration <name>    Debug (default) or Release; timings mean little in Debug. --test in Release
 #                             builds with ENABLE_TESTABILITY=YES so @testable imports compile
 #   --team <team id>          overrides APPLE_DEV_TEAM
-#   --build-there             build on the phone's host instead of here: --project is then a path there
-#                             (a checkout of the same source). Only the result comes back; nothing is copied there.
+#   --build-there             --project is a path on the phone's host (a checkout there), built as it is;
+#                             nothing is sent. Without it, a phone on another host gets the git checkout
+#                             holding --project (tracked and untracked, not ignored, files) mirrored to
+#                             ~/.cache/device-run/src/<repo> there, and the build runs in that mirror.
 #   --out <dir>               where the run's results land here (default ./.build/device-run)
 # Exit: 0 when the action passed; 1 when it failed; 2 usage; 3 no phone found.
+
+# The whole script is one { } block, so bash reads all of it before running any: a rolesmith update
+# that rewrites this file mid-run does not change the run.
+{
 set -euo pipefail
 
 usage() { sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'; exit 2; }
@@ -50,6 +60,7 @@ while [ $# -gt 0 ]; do
     --team) team=$2; shift 2 ;;
     --out) out=$2; shift 2 ;;
     --build-there) build_there=1; shift ;;
+    --build) action=build; shift ;;
     --install) action=install; shift ;;
     --launch) action=launch; shift; case ${1:-} in ''|-*) ;; *) launch_secs=$1; shift ;; esac ;;
     --test) action=test; shift; while [ $# -gt 0 ] && [ "${1#-}" = "$1" ]; do tests+=("$1"); shift; done ;;
@@ -175,11 +186,57 @@ BUILD
 verb=build; [ "$action" = test ] && verb=build-for-testing
 testable=; [ "$action" = test ] && [ "$config" != Debug ] && testable=1
 only_list=${tests[*]+"${tests[*]}"}
-there=; [ -n "$build_there" ] && [ -n "$host" ] && there=1
+# The build runs where the phone is paired. A phone on another host gets the source, not the products:
+# the checkout holding --project is mirrored there (what git tracks, plus untracked files it does not
+# ignore; weights and build output are ignored), and --project becomes its path in the mirror.
+# One mirror per repo (named from origin, so every worktree of it shares the mirror and the build's
+# DerivedData), held under a lock from the send to the end of the build; a lock older than 30 min is
+# a dead run's and is taken over.
+source_sent= lock=
+commit_of() { # checkout -> its short HEAD, +uncommitted when it has changes; nothing outside git
+  local c; c=$(git -C "$1" rev-parse --short HEAD 2>/dev/null) || return 0
+  [ -z "$(git -C "$1" status --porcelain 2>/dev/null)" ] || c="$c+uncommitted"
+  echo "$c"
+}
+unlock() { [ -z "$lock" ] || ssh -o BatchMode=yes "$host" "rmdir $(q "$lock")" 2>/dev/null || true; lock=; }
+send_source() {
+  local root rel name dir filter s
+  root=$(git -C "$project" rev-parse --show-toplevel 2>/dev/null) \
+    || die "--project $project is in no git checkout: pass --build-there with a checkout's path on $host"
+  rel=${project#"$root"}; rel=${rel#/}
+  name=$(basename "$(git -C "$root" remote get-url origin 2>/dev/null || echo "$root")" .git)
+  dir=.cache/device-run/src/$name
+  s=$(date +%s)
+  until ssh -o BatchMode=yes "$host" "mkdir -p .cache/device-run/src; find $(q "$dir.lock") -maxdepth 0 -mmin +30 -exec rmdir {} \; 2>/dev/null; mkdir $(q "$dir.lock") 2>/dev/null"; do
+    [ $(( $(date +%s) - s )) -lt 1800 ] || die "$host:$dir.lock held for 30 min by another build"
+    say "another build of $name is running on $host; waiting"; sleep 15
+  done
+  lock=$dir.lock; trap unlock EXIT
+  filter=$(mktemp)
+  # One include rule per file and per directory above it, then exclude the rest; --delete-excluded
+  # makes the mirror exactly that list, so a file deleted here is gone there too.
+  (cd "$root" && git ls-files -co --exclude-standard) | awk '
+    { gsub(/[[*?\\]/, "\\\\&"); n = split($0, p, "/"); d = ""
+      for (i = 1; i < n; i++) { d = d "/" p[i]; if (!(d in seen)) { seen[d] = 1; print "+ " d "/" } }
+      print "+ /" $0 }
+    END { print "- *" }' > "$filter"
+  ssh -o BatchMode=yes "$host" "mkdir -p $(q "$dir")"
+  s=$(date +%s)
+  rsync -a --delete --delete-excluded --filter=". $filter" "$root/" "$host:$dir/" || { rm -f "$filter"; die "sending the source to $host failed"; }
+  rm -f "$filter"
+  source_sent=$(commit_of "$root")
+  say "source $source_sent sent to $host:$dir in $(( $(date +%s) - s ))s"
+  project=$dir${rel:+/$rel}
+  dd_there=.cache/device-run/build/$name/DerivedData
+}
+there=; [ -n "$host" ] && there=1
+dest="id=$udid"
 if [ -n "$there" ]; then
-  dd_there=.cache/device-run/$scheme/DerivedData; dest="id=$udid"
+  dd_there=.cache/device-run/$scheme/DerivedData
+  [ -n "$build_there" ] || send_source   # sets dd_there to the mirror's own
 else
-  dd_there=$out/DerivedData; dest="id=$udid"; [ -n "$host" ] && dest='generic/platform=iOS'
+  dd_there=$out/DerivedData
+  source_sent=$(commit_of "$project")
 fi
 envs=$(printf 'export APPLE_DEV_P12_B64=%q APPLE_DEV_P12_PASSWORD=%q ASC_KEY_ID=%q ASC_ISSUER_ID=%q ASC_PRIVATE_KEY_B64=%q TEAM=%q PROJ=%q SCHEME=%q DEST=%q VERB=%q ONLY=%q DD=%q CONFIG=%q TESTABLE=%q\n' \
   "$APPLE_DEV_P12_B64" "$APPLE_DEV_P12_PASSWORD" "$ASC_KEY_ID" "$ASC_ISSUER_ID" "$ASC_PRIVATE_KEY_B64" "$team" "$project" "$scheme" "$dest" "$verb" "$only_list" "$dd_there" "$config" "$testable")
@@ -188,23 +245,21 @@ s=$(date +%s)
 if [ -n "$there" ]; then built=$( { echo "$envs"; build_script; } | ssh -o BatchMode=yes "$host" 'bash -s') || die "build on $host failed"
 else built=$( { echo "$envs"; build_script; } | bash -s) || die "build failed: $dd_there/build.log"; fi
 app=${built##*APP=}
+unlock
 say "built in $(( $(date +%s) - s ))s${there:+ on $host}"
 products=$(dirname "$(dirname "$app")")   # .../Build/Products
+if [ "$action" = build ]; then
+  printf '{"phone":"%s","udid":"%s","host":"%s","app":"%s","action":"build","source":"%s","status":0}\n' \
+    "$phone" "$udid" "${host:-$(hostname -s)}" "$app" "${source_sent:-}" | tee "$out/run.json"
+  exit 0
+fi
 if [ -n "$there" ]; then
   bundle=$(ssh -o BatchMode=yes "$host" "/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' $(q "$app/Info.plist")")
   remote=.cache/device-run/$bundle; rapp=$app; rproducts=$products
   ssh -o BatchMode=yes "$host" "mkdir -p $remote/in"
 else
   bundle=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")
-  # ---- the products and copy-ins reach the phone's host -------------------------------------------
-  if [ -n "$host" ]; then
-    remote=.cache/device-run/$bundle
-    ssh -o BatchMode=yes "$host" "mkdir -p $remote/products $remote/in"
-    rsync -a --delete "$products/" "$host:$remote/products/"
-    rapp=$remote/products/$config-iphoneos/$(basename "$app"); rproducts=$remote/products
-  else
-    remote=; rapp=$app; rproducts=$products
-  fi
+  remote=; rapp=$app; rproducts=$products
 fi
 
 # ---- install, then copy into the app's data container ---------------------------------------------
@@ -220,11 +275,13 @@ i=0
 for c in ${copies[@]+"${copies[@]}"}; do
   src=${c%%=*}; dst=${c#*=}
   if [ "${src#there:}" != "$src" ]; then   # already on the phone's host: copy from there, send nothing
-    rsrc=${src#there:}; src=$rsrc
+    rsrc=${src#there:}; rsrc=${rsrc#\~/}; src=$rsrc   # commands there start in its home
   else
   src=${src/#\~/$HOME}
   [ -e "$src" ] || die "--copy-in: $src does not exist"
   if [ -n "$host" ]; then
+    kb=$(du -sk "$src" | cut -f1)
+    [ "$kb" -lt 102400 ] || die "--copy-in: $src is $(( kb / 1024 )) MB, too much to send from this host: download it on $host (models from Hugging Face) and pass there:<path>"
     # Under $HOME it lands at the same path on the phone's host, so a copy made there by hand is reused.
     case $src in "$HOME"/*) rdir=$(dirname "${src#"$HOME"/}") ;; *) rdir=$remote/in/$i ;; esac
     ssh -o BatchMode=yes "$host" "mkdir -p $(q "$rdir")"
@@ -276,6 +333,7 @@ case $action in
     else rm -rf "$out/attachments"; cp -R ~/.cache/device-run/"$bundle"/attachments "$out/attachments" 2>/dev/null || true; fi
     say "summary: $out/summary.json, attachments: $out/attachments" ;;
 esac
-printf '{"phone":"%s","udid":"%s","host":"%s","bundle":"%s","action":"%s","status":%d}\n' \
-  "$phone" "$udid" "${host:-$(hostname -s)}" "$bundle" "$action" "$status" | tee "$out/run.json"
+printf '{"phone":"%s","udid":"%s","host":"%s","bundle":"%s","action":"%s","source":"%s","status":%d}\n' \
+  "$phone" "$udid" "${host:-$(hostname -s)}" "$bundle" "$action" "${source_sent:-}" "$status" | tee "$out/run.json"
 exit $(( status == 0 ? 0 : 1 ))
+}
