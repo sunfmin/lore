@@ -1,2 +1,2 @@
-description = "Runs an iOS app, its tests and its measurements on a real iPhone, on this host or one SSH reaches; added beside ios-app-coder, with apple-dev-signing"
+description = "Runs an iOS app, its tests and its measurements on a real iPhone, built on the host the phone is paired to (this one, or one SSH reaches); added beside ios-app-coder, with apple-dev-signing"
 programs = ["xcodegen"]
