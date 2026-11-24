@@ -1,11 +1,10 @@
 ---
 name: write-help
-description: "Use when a Rust CLI's command, refusal or topic is added or changed: writing its help where its fact lives, with agent-help where the repo uses it."
+description: "Use when a Rust CLI's command, refusal or topic is added or changed: writing its help where its fact lives, always with agent-help; a repo not on it yet is moved onto it first."
 ---
 # Writing help with agent-help
 
-Help is the only manual (the skill agent-cli). Where the repo uses `agent-help`, it is written with
-`agent-help`; its crate docs say how.
+Help is the only manual (the skill agent-cli), and it is always written with `agent-help`; its crate docs say how. A repo whose help is not on `agent-help` yet (hand-written `about`, `long_about`, `after_help` or a help string of its own) is moved onto it first, in a commit of its own, before the change that touches its help: the dependency from git, pinned to a commit as the siblings on it pin it, and every existing command's and refusal's text moved where its fact lives.
 
 ## Where it lives
 
