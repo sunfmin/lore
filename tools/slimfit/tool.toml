@@ -1,0 +1,5 @@
+description = "slimfit: measures each change to a codebase and ratchets the result: size, tests, coverage, mutants"
+check = "slimfit --version"
+[install]
+brew = "sunfmin/tap/slimfit"
+version = "stable"                            # follows the tap: factorium cuts and installs each version

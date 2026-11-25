@@ -1,0 +1,7 @@
+[[prohibition]]
+rule = "Never change a project's code or documents in its checkout; write the change as an issue"
+why = "A checkout is factorium's worktree and its base moves only by promotion; a hand edit races the workers and skips the gate."
+
+[[prohibition]]
+rule = "Never merge, approve or push to another's pull request or branch"
+why = "Landing is factorium's; a merge by hand moves a base around the gate."

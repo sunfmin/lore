@@ -1,0 +1,5 @@
+description = "truefit: keeps a system's tests, stand-ins and models true to the real system, and its promises checked"
+check = "truefit --version"
+[install]
+brew = "sunfmin/tap/truefit"
+version = "stable"                            # follows the tap: factorium cuts and installs each version
