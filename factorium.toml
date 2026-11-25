@@ -1,6 +1,12 @@
-# How factorium gates this library (factorium SPEC.md §5): rolesmith check, fast and slow alike.
+# How factorium gates and cuts this library (factorium SPEC.md §5): gate.sh, fast and slow alike.
 [gate]
 fast = "./gate.sh"
 fast_limit = 120
 slow = "./gate.sh"
 slow_limit = 120
+
+# A cut (SPEC.md §1.14) installs the promoted main into this host's worker role directories
+# (lore#4); see cut/install-roles. No formula: lore is no Homebrew tool.
+[cut]
+steps = ["cut/install-roles"]
+limit = 600

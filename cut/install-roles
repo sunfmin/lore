@@ -1,0 +1,101 @@
+#!/usr/bin/env -S uv run -q --script
+# /// script
+# requires-python = ">=3.11"
+# ///
+"""Install this library's newest main into every worker role directory on this host.
+
+lore's [cut] step (factorium.toml, lore#4): a promotion moved main, so
+1. `rolesmith source update` the source whose url is this library's
+   (found in `rolesmith source list --json`, whatever this host named it);
+2. `rolesmith update <role> --project <dir>` for each role of that source,
+   in each project on rolesmith's projects record that is a worker role
+   directory: under ~/.local/share/roles/, holding a rolesmith.toml that git
+   does not track. A tracked rolesmith.toml (the control repo) pins its
+   revision in a commit a person decides on; a directory that is gone is an
+   old scratch project still on the record. Both are skipped.
+
+It prints one JSON line per project on the record: project, status
+(updated | unchanged | skipped | failed), why, and the revs of this
+library's roles before and after. It exits 1 if the source or any update
+failed. Run again with nothing new, it changes nothing.
+"""
+
+import json
+import os
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+
+URL = "https://github.com/sunfmin/lore"
+HOME = Path.home()
+DATA = Path(os.environ.get("XDG_DATA_HOME") or HOME / ".local" / "share")
+PROJECTS = DATA / "rolesmith" / "projects.toml"
+ROLES = (HOME / ".local" / "share" / "roles").resolve()
+
+
+def rolesmith(*args):
+    p = subprocess.run(["rolesmith", "--json", *args], capture_output=True, text=True)
+    if p.returncode != 0:
+        raise RuntimeError(f"rolesmith {' '.join(args)}: {p.stderr.strip() or p.stdout.strip()}")
+    return json.loads(p.stdout)
+
+
+def our_revs(project):
+    record = tomllib.loads((project / "rolesmith.toml").read_text())
+    return {r["name"]: r["rev"] for r in record.get("role", []) if r.get("url") == URL}
+
+
+def skip_why(project):
+    if not project.is_dir():
+        return "missing: no longer exists"
+    if not project.resolve().is_relative_to(ROLES):
+        return f"not a role directory: outside {ROLES}"
+    if not (project / "rolesmith.toml").is_file():
+        return "not a role directory: no rolesmith.toml"
+    tracked = subprocess.run(
+        ["git", "-C", str(project), "ls-files", "--error-unmatch", "rolesmith.toml"],
+        capture_output=True,
+    )
+    if tracked.returncode == 0:
+        return "git checkout: rolesmith.toml is committed, a person moves its revision"
+    return None
+
+
+def install(project):
+    line = {"project": str(project), "status": "skipped", "why": skip_why(project)}
+    if line["why"]:
+        return line
+    try:
+        line["before"] = our_revs(project)
+        for role in line["before"]:
+            rolesmith("update", role, "--project", str(project))
+        line["after"] = our_revs(project)
+    except (RuntimeError, OSError, tomllib.TOMLDecodeError, KeyError) as e:
+        line.update(status="failed", why=str(e))
+        return line
+    changed = line["before"] != line["after"]
+    line.update(status="updated" if changed else "unchanged",
+                why=None if line["before"] else "no role of this library")
+    return line
+
+
+def main():
+    sources = rolesmith("source", "list")["sources"]
+    names = [s["name"] for s in sources if s["url"] == URL]
+    if not names:
+        print(json.dumps({"error": f"no rolesmith source has url {URL}"}))
+        return 1
+    for name in names:
+        rolesmith("source", "update", name)
+    projects = tomllib.loads(PROJECTS.read_text()).get("projects", []) if PROJECTS.exists() else []
+    failed = False
+    for project in projects:
+        line = install(Path(project))
+        failed |= line["status"] == "failed"
+        print(json.dumps(line), flush=True)
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
