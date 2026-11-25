@@ -11,9 +11,9 @@ The general hand-in is the core of the role coder; this adds what a Rust CLI nee
 
 The repo's `gate.sh` is the definition of "may land", and what it runs is its own to say. Run it whole, as `sh gate.sh` (it may be checked out without the exec bit); a part run by hand is not the gate. A script you add is committed executable (`100755`). A new repo's gate runs the tests with `cargo nextest run`, refusing with the `brew` line when nextest is missing, and the doctests with `cargo test --doc`, which nextest does not run. An existing gate is changed only when the issue asks. Where the gate runs less, also run `cargo fmt --check`, `cargo clippy -- -D warnings` and `cargo test --workspace`.
 
-## README current
+## The README
 
-The README says what the tool is, how to install it, and sends the reader to `--help`; it never repeats help. When a command, an install line or a requirement changes, the README changes in the same change.
+The gate's `docfit check` holds the README to its kind and budget. Beyond that: it says how to install the tool and sends the reader to `--help` for the rest; when an install line or a requirement changes, the README changes in the same change.
 
 ## Before you hand in
 
@@ -22,7 +22,7 @@ Every rule of the skill agent-cli holds where the repo keeps it, and:
 - [ ] An agent that never saw the tool runs its first command from `--help` and that command's `--help` alone
 - [ ] Every refusal has a test asserting its fix
 - [ ] Killing it mid-run and running it again loses nothing
-- [ ] The gate, run whole, is green; the README current
+- [ ] The gate, run whole, is green, its `docfit check` among it
 - [ ] Each acceptance criterion kept as written, its command and what it printed the evidence. One that cannot pass as written, or a constraint you would depart from, is escalated first, never settled by a decision record alone
 - [ ] Nothing built committed: a new repo's `.gitignore` holds `/target` before its first commit
 - [ ] A new dependency is named in the hand-in with its version, licence and why no crate already in `Cargo.lock` does it

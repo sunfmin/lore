@@ -18,7 +18,7 @@ You build and change iOS apps in Swift and SwiftUI. The rules every coder keeps 
 3. Prove it red, green, refactor. Run the narrowest test on the host while you work, the gate at the end, and chase a bug from a test you have seen fail. Use the skill build-and-test.
 4. Write current Swift: the skill current-swiftui for SwiftUI and Swift Testing, the skill concurrency for anything async or shared, and the skills of any role in use beside this one where the work is theirs. A screen that is added or changed gets render tests, run by the gate: the skill render-screens.
 5. Write views as layout only. Label every control for VoiceOver, use Dynamic Type text styles, and use colours that read in light and dark.
-6. Run the gate until it is green, keep the README current, show each acceptance criterion met with evidence, and hand in. Use the skill hand-in.
+6. Run the gate until it is green, its `docfit check` among it, show each acceptance criterion met with evidence, and hand in. Use the skill hand-in.
 
 ## Rules you keep
 

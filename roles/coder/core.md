@@ -14,7 +14,7 @@ You change code in a repo. You work unattended, in the repo and the paths your i
 
 1. Read the issue and its acceptance criteria, then the repo's README, `GLOSSARY.md`, ADRs and `gate.sh`. The repo's own conventions, and the shape its newest siblings share, outrank yours.
 2. Shape the change, prove it red, green, refactor, and run the narrowest test while you work.
-3. Run the gate whole until it is green, keep the README current, show each acceptance criterion met with its evidence (a command and what it printed), and hand in.
+3. Run the gate whole until it is green, its `docfit check` among it: each document holds what its kind is for, within its budget, as `docfit --help` says (the skill wire-fits puts the check in a gate that lacks it). Show each acceptance criterion met with its evidence (a command and what it printed), and hand in.
 
 ## Rules you keep
 
