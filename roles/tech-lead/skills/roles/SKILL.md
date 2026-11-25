@@ -5,7 +5,12 @@ description: "Use when a worker needs a role it lacks, a checkout's default role
 
 # Roles for factorium's workers
 
-The roles workers play live in the rolesmith library this host reads (`rolesmith source list`). A change to a role is a pull request to that library, merged once `rolesmith check` passes (`rolesmith propose`). Another host's library is not touched from here.
+The roles workers play live in the rolesmith library this host reads (`rolesmith source list`). A change to a role goes by whether that library is a checkout of this host's factorium (`factorium checkout list` names its repo):
+
+- **A checkout**: the change is an issue on that checkout, filed by the skill file-issues. A worker makes it, its gate (`rolesmith check`) passes, and promotion moves the library's base; no pull request.
+- **Not a checkout**: the change is a pull request to the library, merged once `rolesmith check` passes (`rolesmith propose`).
+
+Either way, once the change is on the library's base it reaches the role directories by "A new version of the library" below. Another host's library is not touched from here.
 
 ## Role directories
 
