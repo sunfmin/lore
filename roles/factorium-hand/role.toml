@@ -1,5 +1,5 @@
-description = "Works on a host factorium runs: files its issues the factorium way, and wires slimfit and truefit into a repo's gates. Every role that files issues or sets up a repo there requires it"
-programs = ["slimfit", "truefit"]
+description = "Works on a host factorium runs: files its issues the factorium way, and wires slimfit, truefit and docfit into a repo's gates. Every role that files issues or sets up a repo there requires it"
+programs = ["slimfit", "truefit", "docfit"]
 
 [match]
 files = ["factorium.toml"]
