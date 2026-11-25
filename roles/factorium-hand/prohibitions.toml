@@ -1,0 +1,3 @@
+[[prohibition]]
+rule = "Never edit a fit's baseline or record by hand"
+why = "A baseline moves only by the fit's own ratchet; an edited one lets a worse number through the gate."

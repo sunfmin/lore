@@ -1,4 +1,5 @@
 description = "Changes code in a repo unattended, whatever its language: deep modules, one home per fact, red first, the repo's own words, and its gate as done. Other coding roles require it"
+requires = ["factorium-hand"]
 
 [[skill]]
 name = "codebase-design"
