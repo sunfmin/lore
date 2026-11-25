@@ -1,0 +1,6 @@
+# How factorium gates this library (factorium SPEC.md §5): rolesmith check, fast and slow alike.
+[gate]
+fast = "./gate.sh"
+fast_limit = 120
+slow = "./gate.sh"
+slow_limit = 120
