@@ -15,7 +15,7 @@ rolesmith env apple-dev-signing -- <skill dir>/device-run.sh --project <dir with
 It runs the same on the host the phone is plugged into (a person there, or you over SSH) as on any other: it finds the phone here first, and then builds and runs here.
 
 - `--build` (build only; nothing reaches the phone), `--install`, `--launch [seconds]` (console attached) or `--test [targets…]` (results and pictures back in `--out`, default `.build/device-run`).
-- `--configuration Release` when the numbers matter: speed and memory measured on a Debug build mislead (rollmind#65: an unoptimized resize took 8 s of a 10 s caption). Debug is the default.
+- `--configuration Release` when the numbers matter: speed and memory measured on a Debug build mislead: a Debug build's unoptimized image resize can take most of a caption's time (time one step in both configurations to see it). Debug is the default.
 - `--copy-in <src>=<dest>` puts files the app reads (models, a sample library) into its data container without bundling them. Run it again after every build: an upgrade keeps the container. `there:<path>` is a path on the phone's host, relative to its home; use it for models (below). A plain source is on your host and, with the phone elsewhere, must be under 100 MB.
 - It finds the phone as below, signs in a keychain it removes on exit, and ends with one JSON line: the phone, its host, the action, the source commit it built (with `+uncommitted` when the checkout had changes) and its status. Exit 3 means no phone was found.
 
