@@ -2,22 +2,29 @@
 # /// script
 # requires-python = ">=3.11"
 # ///
-"""Install this library's newest main into every worker role directory on this host.
+"""Install this library's newest main into every project on this host that follows it.
 
-lore's [cut] step (factorium.toml, lore#4): a promotion moved main, so
+lore's [cut] step (factorium.toml, lore#4, lore#5): a promotion moved main, so
 1. `rolesmith source update` the source whose url is this library's
    (found in `rolesmith source list --json`, whatever this host named it);
-2. `rolesmith update <role> --project <dir>` for each role of that source,
-   in each project on rolesmith's projects record that is a worker role
-   directory: under ~/.local/share/roles/, holding a rolesmith.toml that git
-   does not track. A tracked rolesmith.toml (the control repo) pins its
-   revision in a commit a person decides on; a directory that is gone is an
-   old scratch project still on the record. Both are skipped.
+2. for each project on rolesmith's projects record, `rolesmith update <role>
+   --project <dir>` for each role of that source, when the project is
+   - a worker role directory: under ~/.local/share/roles/, holding a
+     rolesmith.toml that git does not track; or
+   - a git project that follows lore: a committed `.rolesmith-follow` at its
+     root names the branch to commit to. The script refuses it (failed) when
+     the files rolesmith writes (OWN) have uncommitted changes, so a
+     person's edit never enters its commit; else it pulls that branch
+     (--ff-only), updates, commits only the OWN files that changed, with a
+     message naming the lore commit, and pushes that branch (never forced).
+   Any other git checkout of its rolesmith.toml, and a directory that is gone
+   (an old scratch project still on the record), are skipped.
 
 It prints one JSON line per project on the record: project, status
-(updated | unchanged | skipped | failed), why, and the revs of this
-library's roles before and after. It exits 1 if the source or any update
-failed. Run again with nothing new, it changes nothing.
+(updated | unchanged | skipped | failed), why, the revs of this library's
+roles before and after, and for a follower that moved, its commit. It exits
+1 if the source or any project failed. Run again with nothing new, it
+changes nothing.
 """
 
 import json
@@ -32,6 +39,9 @@ HOME = Path.home()
 DATA = Path(os.environ.get("XDG_DATA_HOME") or HOME / ".local" / "share")
 PROJECTS = DATA / "rolesmith" / "projects.toml"
 ROLES = (HOME / ".local" / "share" / "roles").resolve()
+FOLLOW = ".rolesmith-follow"
+# The files rolesmith writes that a project commits; its skills are behind its managed .gitignore lines.
+OWN = ("rolesmith.toml", ".gitignore", "CLAUDE.md", "AGENTS.md")
 
 
 def rolesmith(*args):
@@ -39,6 +49,24 @@ def rolesmith(*args):
     if p.returncode != 0:
         raise RuntimeError(f"rolesmith {' '.join(args)}: {p.stderr.strip() or p.stdout.strip()}")
     return json.loads(p.stdout)
+
+
+def git(project, *args):
+    p = subprocess.run(["git", "-C", str(project), *args], capture_output=True, text=True)
+    if p.returncode != 0:
+        raise RuntimeError(f"git {' '.join(args)}: {p.stderr.strip() or p.stdout.strip()}")
+    return p.stdout
+
+
+def tracked(project, path):
+    return subprocess.run(
+        ["git", "-C", str(project), "ls-files", "--error-unmatch", path], capture_output=True,
+    ).returncode == 0
+
+
+def changed_own(project):
+    status = git(project, "status", "--porcelain", "--untracked-files=all", "--", *OWN)
+    return [l[3:] for l in status.splitlines()]
 
 
 def our_revs(project):
@@ -53,24 +81,52 @@ def skip_why(project):
         return f"not a role directory: outside {ROLES}"
     if not (project / "rolesmith.toml").is_file():
         return "not a role directory: no rolesmith.toml"
-    tracked = subprocess.run(
-        ["git", "-C", str(project), "ls-files", "--error-unmatch", "rolesmith.toml"],
-        capture_output=True,
-    )
-    if tracked.returncode == 0:
-        return "git checkout: rolesmith.toml is committed, a person moves its revision"
+    if tracked(project, "rolesmith.toml"):
+        return f"git checkout: rolesmith.toml is committed and no {FOLLOW} follows lore"
     return None
 
 
-def install(project):
-    line = {"project": str(project), "status": "skipped", "why": skip_why(project)}
-    if line["why"]:
-        return line
+def update(project, line):
+    line["before"] = our_revs(project)
+    for role in line["before"]:
+        rolesmith("update", role, "--project", str(project))
+    line["after"] = our_revs(project)
+
+
+def follow(project, line):
+    """Update a git project that follows lore on its branch, commit rolesmith's files, push."""
+    branch = (project / FOLLOW).read_text().strip()
+    head = git(project, "rev-parse", "--abbrev-ref", "HEAD").strip()
+    if head != branch:
+        raise RuntimeError(f"on branch {head}, but {FOLLOW} names {branch}")
+    dirty = changed_own(project)
+    if dirty:
+        raise RuntimeError(f"uncommitted changes in rolesmith's files: {', '.join(dirty)}")
+    git(project, "pull", "-q", "--ff-only", "origin", branch)
+    update(project, line)
+    changed = changed_own(project)
+    if not changed:
+        return
+    lore = ", ".join(sorted(set(line["after"].values())))
+    git(project, "add", "--", *changed)
+    git(project, "commit", "-q", "-m", f"Follow lore {lore}: rolesmith update (lore's cut)",
+        "--", *changed)
+    line["commit"] = git(project, "rev-parse", "HEAD").strip()
     try:
-        line["before"] = our_revs(project)
-        for role in line["before"]:
-            rolesmith("update", role, "--project", str(project))
-        line["after"] = our_revs(project)
+        git(project, "push", "-q", "origin", f"HEAD:refs/heads/{branch}")
+    except RuntimeError as e:
+        raise RuntimeError(f"committed {line['commit']} but did not push it: {e}") from e
+
+
+def install(project):
+    line = {"project": str(project), "status": "skipped", "why": None}
+    following = project.is_dir() and tracked(project, FOLLOW)
+    if not following:
+        line["why"] = skip_why(project)
+        if line["why"]:
+            return line
+    try:
+        follow(project, line) if following else update(project, line)
     except (RuntimeError, OSError, tomllib.TOMLDecodeError, KeyError) as e:
         line.update(status="failed", why=str(e))
         return line
