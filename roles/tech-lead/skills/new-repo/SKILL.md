@@ -10,11 +10,7 @@ The owner says "start a new project" or "make a new repo": set it up whole, with
 ## Steps
 
 1. **Repository.** One the owner names is used as it is. Otherwise `gh repo create <owner>/<name> --private --clone` into `~/Developments/<name>`, named as the owner said, public only when they said so.
-2. **Agent docs**, as the engineering skills expect them, with the recommended answer for every choice:
-   - `docs/agents/issue-tracker.md`: issues live in factorium's tracker, read and written with `factorium issue add|list|show|comment|block <checkout> …`, `<checkout>` being this repo's name in `factorium checkout list`. Not GitHub's.
-   - `docs/agents/domain.md`: single-context (a root `GLOSSARY.md` and `docs/adr/`, made when first needed).
-   - `CLAUDE.md`, made when neither it nor `AGENTS.md` exists: what the repo is in a line, where its manual is, and the two pointers above. Nothing a command or a file already says.
-   - No triage labels: factorium has none.
+2. **Agent docs**: at the repo's root, run `<this skill's dir>/write-agent-docs <name>` (`--help` says what it writes; it never overwrites a differing file without `--force`), then give a `CLAUDE.md` it made the repo's one line and where its manual is.
 3. **Gate.** `gate.sh` runs the checks the stack can run today (the coding role of that stack says which). `factorium.toml` has `[gate]` with `fast` and `slow` and their limits, in the shape of the newest checkout's. A Homebrew project gets `[cut]` once its release script exists, or an issue that adds both.
 4. **Fits**: the skill wire-fits.
 5. **Done when `./gate.sh` is green.** Commit and push to the default branch as one commit of the setup.
