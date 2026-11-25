@@ -1,0 +1,95 @@
+#!/usr/bin/env -S uv run -q --script
+# /// script
+# requires-python = ">=3.11"
+# ///
+"""Write the agent docs of a new repo for factorium (the skill new-repo, step 2).
+
+Usage, at the repo's root: write-agent-docs <checkout> [--force]
+<checkout> is the repo's name in `factorium checkout list`.
+
+It writes, from the texts in agent-docs/ beside this script ({checkout}
+replaced):
+- docs/agents/issue-tracker.md (agent-docs/issue-tracker.md);
+- docs/agents/domain.md (agent-docs/domain.md);
+- the Agent skills block (agent-docs/agent-skills.md) of CLAUDE.md, or of
+  AGENTS.md when only that exists: the lines from its `## Agent skills`
+  heading to the next `## ` heading, added at the end when there is none.
+  With neither file, CLAUDE.md is made as `# <checkout>` and the block.
+
+A file that does not exist, or an instructions file without the block, is
+written; one equal to what it would write is
+unchanged; one that differs is left as it is unless --force. It prints one
+JSON line per file: file, status (written | unchanged | differs), and for
+differs the unified diff from the file to what it would write. It exits 1
+when any file differs and was not forced.
+"""
+
+import argparse
+import difflib
+import json
+import sys
+from pathlib import Path
+
+TEXTS = Path(__file__).resolve().parent / "agent-docs"
+HEADING = "## Agent skills"
+
+
+def with_block(current, block):
+    """`current` with its Agent skills block replaced by `block`, or `block` appended."""
+    lines = current.splitlines(keepends=True)
+    start = next((i for i, l in enumerate(lines) if l.rstrip("\n") == HEADING), None)
+    if start is None:
+        return current.rstrip("\n") + "\n\n" + block
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+    rest = "".join(lines[end:])
+    return "".join(lines[:start]) + block + ("\n" + rest if rest else "")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("checkout", help="the repo's name in `factorium checkout list`")
+    parser.add_argument("--force", action="store_true", help="also overwrite files that differ")
+    args = parser.parse_args()
+
+    def text(name):
+        return (TEXTS / name).read_text().replace("{checkout}", args.checkout)
+
+    block = text("agent-skills.md")
+    instructions = next((n for n in ("CLAUDE.md", "AGENTS.md") if Path(n).exists()), None)
+    wanted = {
+        "docs/agents/issue-tracker.md": text("issue-tracker.md"),
+        "docs/agents/domain.md": text("domain.md"),
+    }
+    adding = set()  # files that only gain text, so they are written without --force
+    if instructions:
+        current = Path(instructions).read_text()
+        wanted[instructions] = with_block(current, block)
+        if HEADING not in current.splitlines():
+            adding.add(instructions)
+    else:
+        wanted["CLAUDE.md"] = f"# {args.checkout}\n\n{block}"
+
+    refused = False
+    for name, want in wanted.items():
+        path = Path(name)
+        have = path.read_text() if path.exists() else None
+        line = {"file": name}
+        if have == want:
+            line["status"] = "unchanged"
+        elif have is None or name in adding or args.force:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(want)
+            line["status"] = "written"
+        else:
+            refused = True
+            line["status"] = "differs"
+            line["diff"] = "".join(difflib.unified_diff(
+                have.splitlines(keepends=True), want.splitlines(keepends=True), name, f"{name} (wanted)"))
+            print(f"write-agent-docs: {name} differs from what it would write; kept (--force overwrites)",
+                  file=sys.stderr)
+        print(json.dumps(line), flush=True)
+    sys.exit(1 if refused else 0)
+
+
+if __name__ == "__main__":
+    main()
