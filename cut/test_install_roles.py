@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.11"
 # ///
-"""Test of cut/install-roles on a fixture host (lore#4, lore#5).
+"""Test of cut/install-roles on a fixture host.
 
 A fresh HOME holds rolesmith's source for this library, whose url git
 redirects to a local bare copy of this repo, and five projects on rolesmith's

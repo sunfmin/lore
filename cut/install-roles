@@ -4,7 +4,7 @@
 # ///
 """Install this library's newest main into every project on this host that follows it.
 
-lore's [cut] step (factorium.toml, lore#4, lore#5): a promotion moved main, so
+lore's [cut] step (factorium.toml): a promotion moved main, so
 1. `rolesmith source update` the source whose url is this library's
    (found in `rolesmith source list --json`, whatever this host named it);
 2. for each project on rolesmith's projects record, `rolesmith update <role>

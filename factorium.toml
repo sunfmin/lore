@@ -6,7 +6,7 @@ slow = "./gate.sh"
 slow_limit = 120
 
 # A cut (SPEC.md §1.14) installs the promoted main into this host's worker role directories
-# (lore#4); see cut/install-roles. No formula: lore is no Homebrew tool.
+# and the git projects that follow lore; see cut/install-roles. No formula: lore is no Homebrew tool.
 [cut]
 steps = ["cut/install-roles"]
 limit = 600
