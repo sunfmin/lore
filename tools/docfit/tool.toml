@@ -1,0 +1,5 @@
+description = "docfit: keeps each of a repo's documents in its one home, within its budget"
+check = "docfit --version"
+[install]
+brew = "sunfmin/tap/docfit"
+version = "stable"                            # follows the tap: factorium cuts and installs each version
