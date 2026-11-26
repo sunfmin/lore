@@ -7,6 +7,8 @@ description: "Use before any xcodebuild that must be development-signed (an iOS 
 
 ## The run's keychain
 
+Run under `rolesmith env apple-dev-signing -- <command>`: it hands the run `APPLE_DEV_P12_B64`, `APPLE_DEV_P12_PASSWORD`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_PRIVATE_KEY_B64` and `APPLE_DEV_TEAM`.
+
 1. Write the p12 and the `.p8` from the credentials (`APPLE_DEV_P12_B64`, `ASC_PRIVATE_KEY_B64`, base64) into a directory only you can read (`umask 077`).
 2. `security create-keychain -p <random> <kc>`, then `set-keychain-settings <kc>` and `unlock-keychain -p <random> <kc>`.
 3. `security import <p12> -k <kc> -P <password> -T /usr/bin/codesign`.

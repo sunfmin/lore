@@ -6,9 +6,6 @@
       "role.toml"
     ]
   },
-  "roles/apple-dev-signing/core.md": {
-    "paragraph": 621
-  },
   "roles/coder/core.md": {
     "pointers": [
       "GLOSSARY.md"
@@ -20,11 +17,8 @@
     ]
   },
   "roles/factorium-hand/skills/wire-fits/SKILL.md": {
-    "paragraph": 637,
     "pointers": [
-      ".docfit/baseline.json",
       ".slimfit/baseline.json",
-      "docfit.toml",
       "slimfit.toml",
       "truefit.toml"
     ]
