@@ -20,11 +20,8 @@
     ]
   },
   "roles/factorium-hand/skills/wire-fits/SKILL.md": {
-    "paragraph": 637,
     "pointers": [
-      ".docfit/baseline.json",
       ".slimfit/baseline.json",
-      "docfit.toml",
       "slimfit.toml",
       "truefit.toml"
     ]
@@ -80,7 +77,6 @@
     ]
   },
   "roles/rust-cli-coder/skills/hand-in/SKILL.md": {
-    "paragraph": 608,
     "pointers": [
       "Cargo.lock"
     ]

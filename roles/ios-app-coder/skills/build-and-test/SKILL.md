@@ -22,7 +22,7 @@ description: "Use on every change to an iOS app, and first when something is rep
 - Run the cheapest test that covers the change:
   - package code: `swift test --filter <Suite>/<test>` on the host, with no simulator;
   - app code, a render test or a UI test: `xcodebuild test -only-testing:<target>/<suite>/<test>` on the simulator (a role beside this one may give a faster first pass, such as ios-render-on-mac).
-  - Then run the whole gate before you hand in.
+  - Then run what the skill hand-in checks before you hand in.
 - In a worktree, give every xcodebuild run its own `-derivedDataPath`, `-clonedSourcePackagesDirPath` and `-resultBundlePath` inside the worktree, and a destination by `id=`. Worktrees that share DerivedData, the package cache or a simulator overwrite each other's builds and app sandboxes.
 - Keep the log short and the failure exact. Pipe xcodebuild through `xcbeautify --quieter` when the repo has it, else `grep -E 'error:|warning:|failed|passed'`, and keep the full log in a file. Read a failure from the result bundle (`xcrun xcresulttool get test-results summary` / `test-details --test-id <id>`), never from the tail of the log.
 - A failure that comes and goes: pin the clock, the seed and the order of async work, then run it repeatedly (`swift test --filter … ` in a loop, or `-test-iterations 50 -run-tests-until-failure`) until it fails often enough to chase.

@@ -14,7 +14,9 @@ You change code in a repo. You work unattended, in the repo and the paths your i
 
 1. Read the issue and its acceptance criteria, then the repo's README, `GLOSSARY.md`, ADRs and `gate.sh`. The repo's own conventions, and the shape its newest siblings share, outrank yours.
 2. Shape the change, prove it red, green, refactor, and run the narrowest test while you work.
-3. Run the gate whole until it is green, its `docfit check` among it: each document holds what its kind is for, within its budget, as `docfit --help` says (the skill wire-fits puts the check in a gate that lacks it). Show each acceptance criterion met with its evidence (a command and what it printed), and hand in.
+3. Check before you hand in, its `docfit check` among it: each document holds what its kind is for, within its budget, as `docfit --help` says (the skill wire-fits puts the check in a gate that lacks it). Show each acceptance criterion met with its evidence (a command and what it printed), and hand in. Who runs the gate whole depends on where you run:
+   - **Off factorium** (no `FACTORIUM_WORKER` in the environment): run the gate whole until it is green; nobody else runs it before the change lands.
+   - **Under factorium**: run the checks of what the change touched (the role for the kind of code names them; heavy ones through `factorium worker exclusive`), commit the records the gate asks of the change (a baseline, a ratchet), then `factorium worker done`. The change's one full gate is its landing's, on the merge with proving: your own whole run is on a base proving has usually moved past by then, so it proves nothing the landing's does not prove again. `factorium worker gate` stays allowed, never required. A red landing is answered by fixing the branch.
 
 ## Rules you keep
 
