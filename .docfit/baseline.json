@@ -28,9 +28,6 @@
       "project.yml"
     ]
   },
-  "roles/ios-app-coder/skills/build-and-test/SKILL.md": {
-    "measurements": 1
-  },
   "roles/ios-app-coder/skills/hand-in/SKILL.md": {
     "pointers": [
       ".swiftlint.yml",
