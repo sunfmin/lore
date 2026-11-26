@@ -1,0 +1,113 @@
+{
+  "CLAUDE.md": {
+    "pointers": [
+      "core.md",
+      "prohibitions.toml",
+      "role.toml"
+    ]
+  },
+  "roles/apple-dev-signing/core.md": {
+    "paragraph": 621
+  },
+  "roles/coder/core.md": {
+    "pointers": [
+      "GLOSSARY.md"
+    ]
+  },
+  "roles/factorium-hand/skills/file-issues/SKILL.md": {
+    "pointers": [
+      "GLOSSARY.md"
+    ]
+  },
+  "roles/factorium-hand/skills/wire-fits/SKILL.md": {
+    "paragraph": 637,
+    "pointers": [
+      ".docfit/baseline.json",
+      ".slimfit/baseline.json",
+      "docfit.toml",
+      "slimfit.toml",
+      "truefit.toml"
+    ]
+  },
+  "roles/ios-app-coder/core.md": {
+    "pointers": [
+      "project.yml"
+    ]
+  },
+  "roles/ios-app-coder/skills/build-and-test/SKILL.md": {
+    "measurements": 1
+  },
+  "roles/ios-app-coder/skills/hand-in/SKILL.md": {
+    "pointers": [
+      ".swiftlint.yml",
+      "project.yml",
+      "scan.sh"
+    ]
+  },
+  "roles/ios-app-coder/skills/render-screens/SKILL.md": {
+    "bytes": 6455,
+    "measurements": 1,
+    "pointers": [
+      "project.yml"
+    ]
+  },
+  "roles/ios-app-coder/skills/shape-an-app/SKILL.md": {
+    "pointers": [
+      "project.yml"
+    ]
+  },
+  "roles/ios-device-runner/skills/run-on-a-device/SKILL.md": {
+    "bytes": 6561,
+    "measurements": 1,
+    "pointers": [
+      "manifest.json"
+    ]
+  },
+  "roles/ios-on-device-ml/skills/on-device-ml/SKILL.md": {
+    "measurements": 2,
+    "pointers": [
+      "tokenizer.json"
+    ]
+  },
+  "roles/ios-render-on-mac/skills/render-on-the-mac/SKILL.md": {
+    "pointers": [
+      "manifest.json"
+    ]
+  },
+  "roles/rust-cli-coder/core.md": {
+    "pointers": [
+      "Cargo.toml"
+    ]
+  },
+  "roles/rust-cli-coder/skills/hand-in/SKILL.md": {
+    "paragraph": 608,
+    "pointers": [
+      "Cargo.lock"
+    ]
+  },
+  "roles/rust-cli-coder/skills/test-the-binary/SKILL.md": {
+    "pointers": [
+      "Cargo.lock"
+    ]
+  },
+  "roles/rust-flux-prover/core.md": {
+    "pointers": [
+      "verify.sh"
+    ]
+  },
+  "roles/rust-flux-prover/skills/pass-flux/SKILL.md": {
+    "pointers": [
+      "verify.sh"
+    ]
+  },
+  "roles/tech-lead/core.md": {
+    "pointers": [
+      "GLOSSARY.md"
+    ]
+  },
+  "roles/tech-lead/skills/roles/SKILL.md": {
+    "pointers": [
+      "rolesmith.toml"
+    ]
+  }
+}

@@ -4,6 +4,13 @@ fast = "./gate.sh"
 fast_limit = 120
 slow = "./gate.sh"
 slow_limit = 120
+regenerated = [".docfit/baseline.json"]
+
+# idle files each fit's debt as issues of lore. slimfit and truefit are not wired here yet.
+[idle]
+tasks = "docfit --version && docfit next --all"
+every = 86400
+limit = 120
 
 # A cut (SPEC.md §1.14) installs the promoted main into this host's worker role directories
 # and the git projects that follow lore; see cut/install-roles. No formula: lore is no Homebrew tool.
