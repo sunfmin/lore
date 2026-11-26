@@ -71,7 +71,6 @@
     ]
   },
   "roles/rust-cli-coder/skills/hand-in/SKILL.md": {
-    "paragraph": 608,
     "pointers": [
       "Cargo.lock"
     ]
