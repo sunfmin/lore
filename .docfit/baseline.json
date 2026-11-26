@@ -20,11 +20,8 @@
     ]
   },
   "roles/factorium-hand/skills/wire-fits/SKILL.md": {
-    "paragraph": 637,
     "pointers": [
-      ".docfit/baseline.json",
       ".slimfit/baseline.json",
-      "docfit.toml",
       "slimfit.toml",
       "truefit.toml"
     ]
@@ -33,9 +30,6 @@
     "pointers": [
       "project.yml"
     ]
-  },
-  "roles/ios-app-coder/skills/build-and-test/SKILL.md": {
-    "measurements": 1
   },
   "roles/ios-app-coder/skills/hand-in/SKILL.md": {
     "pointers": [
