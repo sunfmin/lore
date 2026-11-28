@@ -36,11 +36,8 @@
     ]
   },
   "roles/ios-app-coder/skills/render-screens/SKILL.md": {
-    "bytes": 6455,
-    "measurements": 1,
-    "pointers": [
-      "project.yml"
-    ]
+    "bytes": 6258,
+    "measurements": 1
   },
   "roles/ios-app-coder/skills/shape-an-app/SKILL.md": {
     "pointers": [
