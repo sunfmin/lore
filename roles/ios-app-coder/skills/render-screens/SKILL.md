@@ -11,11 +11,11 @@ A **render test** draws a real screen of the app, the way the app draws it, insi
 - **its layout:** the frames of those elements;
 - **pixels:** only where words cannot say it, such as which end of a bar is white, or whether a board fills the width.
 
-It does not compare against a stored reference image. Why: a reference image breaks on every simulator or Xcode update and differs by machine architecture, and the assertions above hold across both.
+It does not compare against a stored reference image: one breaks on every simulator or Xcode update and differs by architecture; the assertions above hold across both.
 
 ## The harness (one small file per repo)
 
-- A `bundle.unit-test` target hosted by the app (in `project.yml`), using `@testable import` of the app, plus the package's test fakes for the edges (scripted engine, in-memory store, fixed clock).
+- A unit-test target hosted by the app, using `@testable import` of the app, plus the package's test fakes for the edges (scripted engine, in-memory store, fixed clock).
 - `render(name, size:, style:, of: { view })`:
   - puts the view in a `UIHostingController` in a new `UIWindow` on the app's scene (real safe areas), or in a window of a stated size;
   - waits until the screen has settled (see below);
@@ -45,7 +45,7 @@ Do not multiply every row by every other. Cover each row once, and add combinati
 
 ## What to assert
 
-- **Words:** the screen says what the acceptance criteria say it shows, and does not say what it must hide.
+- **Words:** the screen says what the acceptance criteria say it shows, and not what it must hide.
 - **Layout, from word frames:**
   - every labelled element is inside the window and its safe area;
   - no two labelled elements' frames overlap;
@@ -68,8 +68,8 @@ The pictures then leave through the result bundle: `xcrun xcresulttool export at
 
 ## In the gate
 
-- Render tests that no gate runs rot. The gate builds the app-hosted bundle and runs it: `xcodebuild test -only-testing:<RenderTarget>`, on a device by id, with its own `-derivedDataPath` and `-resultBundlePath` (see the skill build-and-test).
-- If the render tests make the fast gate too slow, they go in the slow gate, and the fast gate keeps the package's tests. (Where the role ios-render-on-mac is in use, a first pass on the Mac can stay in the fast gate.)
+- Render tests that no gate runs rot. The gate runs `xcodebuild test -only-testing:<RenderTarget>` as the skill build-and-test runs xcodebuild.
+- If the render tests make the fast gate too slow, they go in the slow gate, and the fast gate keeps the package's tests (with the role ios-render-on-mac, a first pass on the Mac can stay).
 - A few XCUITest journeys belong in the slow gate too, each calling `try app.performAccessibilityAudit()` on the screens it reaches. The audit finds clipped text, Dynamic Type breakage, contrast problems and small hit regions without any reference image.
 
 ## Reference-image snapshots (only when the repo opts in)
