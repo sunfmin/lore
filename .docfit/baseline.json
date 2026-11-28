@@ -36,8 +36,7 @@
     ]
   },
   "roles/ios-app-coder/skills/render-screens/SKILL.md": {
-    "bytes": 6455,
-    "measurements": 1,
+    "bytes": 6449,
     "pointers": [
       "project.yml"
     ]

@@ -29,7 +29,7 @@ It does not compare against a stored reference image. Why: a reference image bre
 
 ## Settling
 
-Wait for a condition, never a count of sleeps. For example: the model's state says the async answer has arrived, the expected word is present, or two successive renders give the same words. Bound the wait (2 s) and fail with what was last seen. Turn animations off in the test (`.transaction { $0.animation = nil }` on the subject, or `UIView.setAnimationsEnabled(false)`).
+Wait for a condition, never a count of sleeps. For example: the model's state says the async answer has arrived, the expected word is present, or two successive renders give the same words. Bound the wait and fail with what was last seen. Turn animations off in the test (`.transaction { $0.animation = nil }` on the subject, or `UIView.setAnimationsEnabled(false)`).
 
 ## The matrix
 
